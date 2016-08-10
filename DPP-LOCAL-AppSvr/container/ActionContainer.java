@@ -10,24 +10,18 @@ import bean.*;
 public class ActionContainer
 {
 	public static Hashtable<String, BaseCmdBean> objActionTable = null;//登陆客户端列表
-	private static Byte markActionTable = new Byte((byte)1);	       //锁 
+	private static Byte markActionTable = new Byte((byte)1);	
 	
 	private static TimeCheckThrd checkThrd = null;
 
 	InetAddress addr = InetAddress.getLocalHost();
-	public String m_LocalIp = addr.getHostAddress().toString();        //获得本机IP
+	public String m_LocalIp = addr.getHostAddress().toString();//获得本机IP
 	
 	public ActionContainer()throws Exception
 	{	  
 		
 	}
 	
-	/**
-	 * 初始化 objActionTable 、checkThrd
-	 * 并启动线程 checkThrd
-	 * @return
-	 * 
-	 */
 	public static boolean Initialize()
 	{
 		boolean ret = false;
@@ -102,7 +96,7 @@ public class ActionContainer
 			{
 				if(!objActionTable.isEmpty() && objActionTable.containsKey(pKey))
 				{
-						objActionTable.remove(pKey);		        //在哈希表里移除客户端
+						objActionTable.remove(pKey);		//在哈希表里移除客户端
 					
 				}
 			}
@@ -112,14 +106,10 @@ public class ActionContainer
 			exp.printStackTrace();	
 		}
 	}
-	
-	/**
-	 * @param mTimeOut
-	 * @return
-	 */
 	public static LinkedList<String> GetTimeOutList(int mTimeOut)
 	{
-		LinkedList<String> checkList = new LinkedList<String>();	//接收数据列表,用于客户端数据交换
+		LinkedList<String> checkList = new LinkedList<String>();		 //接收数据列表,用于客户端数据交换
+	
 		try
 		{
 			synchronized(markActionTable)
@@ -139,7 +129,7 @@ public class ActionContainer
 			while(!checkList.isEmpty())
 			{
 				String data = checkList.removeFirst();
-				if(null == data)
+				if(null ==  data)
 				{
 					break;
 				}						
