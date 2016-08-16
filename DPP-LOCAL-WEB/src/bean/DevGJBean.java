@@ -73,10 +73,16 @@ public class DevGJBean extends RmiBean
 			case 11://编辑
 				currStatus.setResult(MsgBean.GetResult(msgBean.getStatus()));
 				msgBean = pRmi.RmiExec(currStatus.getCmd(), this, 0, 25); // 得到一个封装了结果集的MsgBean对象 
-			case 0://查询
+			case 0://Admin查询
 				msgBean = pRmi.RmiExec(0, this,  currStatus.getCurrPage(), 25);
 				currStatus.setTotalRecord(msgBean.getCount());
-				request.getSession().setAttribute("Dev_GJ_" + Sid, (Object)msgBean.getMsg());
+				request.getSession().setAttribute("Admin_DevGJ_Info_" + Sid, (Object)msgBean.getMsg());
+				currStatus.setJsp("Dev_GJ.jsp?Sid=" + Sid);
+				break;
+			case 1://User查询
+				msgBean = pRmi.RmiExec(0, this,  currStatus.getCurrPage(), 25);
+				currStatus.setTotalRecord(msgBean.getCount());
+				request.getSession().setAttribute("User_DevGJ_Info_" + Sid, (Object)msgBean.getMsg());
 				currStatus.setJsp("Dev_GJ.jsp?Sid=" + Sid);
 				break;
 			case 3://User单个查询
@@ -86,7 +92,7 @@ public class DevGJBean extends RmiBean
 				break;
 			case 6://Admin查询单个
 				msgBean = pRmi.RmiExec(6, this, 0, 25);
-				request.getSession().setAttribute("User_DevGJ_Info_" + Sid, (DevGJBean)((ArrayList<?>)msgBean.getMsg()).get(0));				
+				request.getSession().setAttribute("One_GJ_" + Sid, (DevGJBean)((ArrayList<?>)msgBean.getMsg()).get(0));				
 				currStatus.setJsp("One_GJ.jsp?Sid=" + Sid + "&Id=" + Id);
 				break;
 		}
@@ -133,7 +139,6 @@ public class DevGJBean extends RmiBean
 	 *
 	 *  地图接口的,拖拽功能,添加标记,删除标记
 	 */
-	
 	public void doDragging(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
 	{
 		getHtmlData(request);
@@ -154,8 +159,6 @@ public class DevGJBean extends RmiBean
 		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
 		outprint.write(Resp);
 	}   
-	
-	
 	
 	/** 导入Excel文档  解析文档中的管井详细数据  
 	 * @param request
@@ -287,10 +290,11 @@ public class DevGJBean extends RmiBean
 		}
 	}
 	
-	/** 管线命名 : 将 "WJ"替换为 "WG" ;
-	 *              "YJ"替换为 "YG"
+	/** 管线命名 
 	 * @param GJ_Id
 	 * @return
+	 * : 将 "WJ"替换为 "WG" ;
+	 *              "YJ"替换为 "YG"
 	 */
 	public String dealGXID(String GJ_Id){
 		String temGJ_Id = ""; // "WJ", "WG"    "YJ", "YG"
@@ -322,6 +326,7 @@ public class DevGJBean extends RmiBean
 								
 			Sid = mySmartUpload.getRequest().getParameter("Sid");
 			currStatus = (CurrStatus)request.getSession().getAttribute("CurrStatus_" + Sid);
+			currStatus.getHtmlData(request, pFromZone);
 			Project_Id = mySmartUpload.getRequest().getParameter("Project_Id");
 
 			if(mySmartUpload.getFiles().getCount() > 0 && mySmartUpload.getFiles().getFile(0).getFilePathName().trim().length() > 0)
@@ -415,6 +420,118 @@ public class DevGJBean extends RmiBean
 		}
 	}
 	
+	/** 更新管井数据列表
+	 * @param request
+	 * @param response
+	 * @param pRmi
+	 * @param pFromZone
+	 * @param pConfig
+	 * 
+	 */
+	public void UpdateExcel(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone, ServletConfig pConfig) 
+	{
+		try
+		{			
+			SmartUpload mySmartUpload = new SmartUpload();
+			mySmartUpload.initialize(pConfig, request, response);
+			mySmartUpload.setAllowedFilesList("xls,xlsx,XLS,XLSX,");
+			mySmartUpload.upload();
+								
+			Sid = mySmartUpload.getRequest().getParameter("Sid");
+			currStatus = (CurrStatus)request.getSession().getAttribute("CurrStatus_" + Sid);
+			currStatus.getHtmlData(request, pFromZone);
+			Project_Id = mySmartUpload.getRequest().getParameter("Project_Id");
+
+			if(mySmartUpload.getFiles().getCount() > 0 && mySmartUpload.getFiles().getFile(0).getFilePathName().trim().length() > 0)
+			{
+				if(mySmartUpload.getFiles().getFile(0).getSize()/1024 <= 3072)//最大3M
+				{		
+					String FileSaveRoute = "/www/DPP-LOCAL/DPP-LOCAL-WEB/files/upfiles/";										
+					//上传现有文档			
+					com.jspsmart.upload.File myFile = mySmartUpload.getFiles().getFile(0);		
+					String File_Name = new SimpleDateFormat("yyyyMMdd").format(new Date()) + CommUtil.Randon()+ "." + myFile.getFileExt();			
+					myFile.saveAs(FileSaveRoute + File_Name);						
+					//录入数据库
+					InputStream is = new FileInputStream(FileSaveRoute + File_Name);					
+					Workbook rwb = Workbook.getWorkbook(is);					
+					Sheet rs = rwb.getSheet(0);					
+				    int rsRows = rs.getRows();  //excel表格行的数量：依据是否有边框。
+				    int succCnt = 0;	
+				    int tmpCnt = 0;
+
+				    //数据起始行
+				    int rowStart = 1;
+				    //循环开始
+				    for(int i=rowStart; i<rsRows; i++)
+				    {				    	
+			    		String id = rs.getCell(1, i).getContents().trim(); 
+			    		if(8 > id.length())
+			    			continue;
+			    		
+			    		tmpCnt ++;
+			    		String top_Height = rs.getCell(4, i).getContents().trim(); 
+			    		String base_Height = rs.getCell(5, i).getContents().trim(); 
+			    		String size = rs.getCell(6, i).getContents().trim(); 
+			    		String in_Id = ""; 
+			    		for(int j=7; j<10; j++)
+			    		{
+			    			if(rs.getCell(j, i).getContents().trim().length() > 7)	//编码长度为8
+			    			{
+			    				in_Id += rs.getCell(j, i).getContents().trim() + ","; 
+			    			}
+			    		}
+			    		String out_Id = rs.getCell(10, i).getContents().trim(); 
+			    		String material = rs.getCell(11, i).getContents().trim(); 
+			    		String flag = "1";
+			    		if(in_Id.contains("000"))
+			    		{
+			    			flag = "0";
+			    		}
+			    		else if(out_Id.contains("999"))
+			    		{
+			    			flag = "2";
+			    		}
+			    		else
+			    		{
+			    			flag = "1";
+			    		}
+			    		String data_Lev = rs.getCell(12, i).getContents().trim(); 
+
+			    		this.setId(id.toUpperCase());			    		
+			    		this.setTop_Height(!CommUtil.isNumeric(top_Height)?"0":top_Height);
+			    		this.setBase_Height(!CommUtil.isNumeric(base_Height)?"0":base_Height);
+			    		this.setSize(size);
+			    		this.setIn_Id(in_Id.toUpperCase());
+			    		this.setOut_Id(out_Id.toUpperCase());
+			    		this.setMaterial(material);
+			    		this.setFlag(flag);
+			    		this.setData_Lev(data_Lev);
+			    		this.setProject_Id(Project_Id);
+			    			    		
+			    		//插入提交
+			    		msgBean = pRmi.RmiExec(13, this, 0, 25);
+				    	if(msgBean.getStatus() == MsgBean.STA_SUCCESS)
+						{
+				    		succCnt ++;
+						}				    	
+				    }
+				    currStatus.setResult("成功更新[" + String.valueOf(succCnt) + "/" + String.valueOf(tmpCnt) + "]个");
+				}
+				else
+				{
+					currStatus.setResult("文档上传失败！文档过大，必须小于3M!");
+				}				
+			}
+			
+			currStatus.setJsp("Update_Excel.jsp?Sid=" + Sid + "&Project_Id=" + Project_Id);
+			request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);	
+		   	response.sendRedirect(currStatus.getJsp());
+		}
+		catch(Exception exp)
+		{
+			exp.printStackTrace();
+		}
+	}
 	
 	/** 导出管井数据列表
 	 * @param request
@@ -480,16 +597,22 @@ public class DevGJBean extends RmiBean
 			    cell=new Label(1,0,"顶部标高",font1);  
 			    sheet.addCell(cell);   
 			    cell=new Label(2,0,"底部标高",font1);  
-			    sheet.addCell(cell);   
-			    cell=new Label(3,0,"入管编号",font1);  
-			    sheet.addCell(cell);   
-			    cell=new Label(4,0,"出管编号",font1);  
-			    sheet.addCell(cell);   
-			    cell=new Label(5,0,"材料类型",font1);  
-			    sheet.addCell(cell);    
-			    cell=new Label(6,0,"所属项目",font1);  
 			    sheet.addCell(cell);  
-			    cell=new Label(7,0,"设备名称",font1);  
+			    cell=new Label(3,0,"尺寸(m)",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(4,0,"入管编号",font1);  
+			    sheet.addCell(cell);   
+			    cell=new Label(5,0,"出管编号",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(6,0,"起终点",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(7,0,"材料类型",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(8,0,"数据等级",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(9,0,"所属项目",font1);  
+			    sheet.addCell(cell);  
+			    cell=new Label(10,0,"设备名称",font1);  
 			    sheet.addCell(cell);  
 			    
 				
@@ -500,9 +623,69 @@ public class DevGJBean extends RmiBean
 					Id = devGJBean.getId();
 					Top_Height = devGJBean.getTop_Height();
 					Base_Height = devGJBean.getBase_Height();
+					Size = devGJBean.getSize();
 					In_Id = devGJBean.getIn_Id();
 					Out_Id = devGJBean.getOut_Id();
+					Data_Lev = "";
+					try{
+						if(devGJBean.getData_Lev() != null && !devGJBean.getData_Lev().trim().equals("")){
+						  	switch(Integer.parseInt(devGJBean.getData_Lev())){
+					  		case 1:
+					  			Data_Lev ="人工插值";
+					  			break;
+					  		case 2:
+						  		Data_Lev ="原始探测";
+						  		break;
+					  		case 3:
+						  		Data_Lev ="竣工图数据";
+						  		break;
+					  		case 4:
+						  		Data_Lev ="人工插值经过现场校验";
+						  		break;
+					  		case 5:
+						  		Data_Lev ="原始探测经过二次校验";
+						  		break;
+					  		case 6:
+						  		Data_Lev ="可疑数据";
+						  		break;
+					  		default:
+						  		Data_Lev ="数据有误，需要更改！";
+							  		break;
+						  	}
+						}
+					}catch(Exception e){
+					  	Data_Lev ="数据有误，需要更改！";
+					}finally{
+					  	if(Data_Lev == null){
+					  		Data_Lev ="";
+					  	}
+					}
 					Material = devGJBean.getMaterial();
+					Flag = "";
+					try{
+						if(devGJBean.getFlag() != null && !devGJBean.getFlag().trim().equals("")){
+						  	switch(Integer.parseInt(devGJBean.getFlag())){
+					  		case 0:
+					  			Flag ="起  点";
+					  			break;
+					  		case 1:
+					  			Flag ="中间点";
+						  		break;
+					  		case 2:
+					  			Flag ="终  点";
+						  		break;
+					  		default:
+					  			Flag ="数据有误，需要更改！";
+							  		break;
+						  	}
+						}
+					}catch(Exception e){
+						Flag ="数据有误，需要更改！";
+					}finally{
+					  	if(Flag == null){
+					  		Flag ="";
+					  	}
+					}
 					Project_Name = devGJBean.getProject_Name();
 					Equip_Name = devGJBean.getEquip_Name();
 
@@ -516,15 +699,21 @@ public class DevGJBean extends RmiBean
 					sheet.addCell(cell);
 					cell = new Label(2, row_Index, Base_Height, font2);
 					sheet.addCell(cell);
-					cell = new Label(3, row_Index, In_Id, font2);
+					cell = new Label(3, row_Index, Size, font2);
 					sheet.addCell(cell);
-					cell = new Label(4, row_Index, Out_Id, font2);
+					cell = new Label(4, row_Index, In_Id, font2);
 					sheet.addCell(cell);
-					cell = new Label(5, row_Index, Material, font2);
+					cell = new Label(5, row_Index, Out_Id, font2);
 					sheet.addCell(cell);
-					cell = new Label(6, row_Index, Project_Name, font2);
+					cell = new Label(6, row_Index, Flag, font2);
 					sheet.addCell(cell);
-					cell = new Label(7, row_Index, Equip_Name, font2);
+					cell = new Label(7, row_Index, Material, font2);
+					sheet.addCell(cell);
+					cell = new Label(8, row_Index, Data_Lev, font2);
+					sheet.addCell(cell);
+					cell = new Label(9, row_Index, Project_Name, font2);
+					sheet.addCell(cell);
+					cell = new Label(10, row_Index, Equip_Name, font2);
 					sheet.addCell(cell);
 
 				}
@@ -544,7 +733,7 @@ public class DevGJBean extends RmiBean
 
 	}
 		
-	/** 根据输入的int值获取相应的sql语句
+	/** 获取相应sql语句
 	 * @see rmi.RmiBean#getSql(int)
 	 *  返回的是一个字符串: sql语句
 	 */
@@ -561,21 +750,21 @@ public class DevGJBean extends RmiBean
 			   break;
 		    case 1://查询（全部）
 		    	Sql = " select t.id, t.Longitude, t.latitude, t.top_Height, t.base_height, t.Size, t.in_id, t.out_id, t.Material, t.Flag, t.Data_Lev, round((t.curr_data),2) , t.sign , t.project_id, t.project_name, t.equip_id ,t.equip_name" +
-		    		  " from view_dev_gj t " + 
+		    		  " from view_dev_gj t " +
  	 		          " order by t.id  ";
-			   break;    
+			   break;
 
 		    case 3://查询（单个）
 		    case 6:
 		    	Sql = " select t.id, t.Longitude, t.latitude, t.top_Height, t.base_height, t.Size, t.in_id, t.out_id, t.Material, t.Flag, t.Data_Lev, round((t.curr_data),2) , t.sign , t.project_id, t.project_name, t.equip_id ,t.equip_name" +
 	    	 	   	  " from view_dev_gj t " +
-	    	 	   	  " where t.id = '"+ Id +"'" + 	
+	    	 	   	  " where t.id = '"+ Id +"' and t.project_id = '"+ currStatus.getFunc_Project_Id() +"'" + 
 		    		  " order by t.id  ";
 			   break;		
 		    case 4://查询（多个）
 		    	Sql = " select t.id, t.Longitude, t.latitude, t.top_Height, t.base_height, t.Size, t.in_id, t.out_id, t.Material, t.Flag, t.Data_Lev, round((t.curr_data),2) , t.sign , t.project_id, t.project_name, t.equip_id ,t.equip_name" +
 		    	 	  " from view_dev_gj t " +
-		    	 	  " where instr('"+ Id +"', t.id) > 0 " + 	
+		    	 	  " where instr('"+ Id +"', t.id) > 0 and t.project_id = '"+ currStatus.getFunc_Project_Id() +"'" +
 				      " order by t.id  ";
 		    	break; 
 		    case 5://查询（项目&子系统）
@@ -589,26 +778,30 @@ public class DevGJBean extends RmiBean
 		    	Sql = "insert into dev_gj(id, top_Height, base_height, Size, in_id, out_id, Material, Flag, Data_Lev, project_id) " +
 		    			"values('"+ Id +"','"+Top_Height+"','"+Base_Height+"','"+Size+"','"+In_Id+"','"+Out_Id+"','"+Material+"','"+Flag+"','"+Data_Lev+"','"+Project_Id+"')";
 		    	break;
+		    case 13://管井更新
+				Sql = " update dev_gj t set t.in_id= '"+ In_Id + "', t.out_id = '"+ Out_Id +"' ,t.top_height= '"+ Top_Height + "', t.base_height = '"+ Base_Height+ "', t.size = '"+ Size + "', t.Flag = '"+ Flag + "', t.Data_Lev = '"+ Data_Lev+"',t.material = '"+ Material + "' " +
+					  " where t.id = '"+ Id +"' and t.project_id = '"+ Project_Id +"'";
+				break;
 		    case 11://编辑
 				Sql = " update dev_gj t set t.in_id= '"+ In_Id + "', t.out_id = '"+ Out_Id +"' ,t.top_height= '"+ Top_Height + "', t.base_height = '"+ Base_Height+ "', t.size = '"+ Size + "', t.Flag = '"+ Flag + "', t.Data_Lev = '"+ Data_Lev+"',t.material = '"+ Material + "' " +
-					  " where t.id = '"+ Id +"'";
+					  " where t.id = '"+ Id +"' and t.project_id = '"+ currStatus.getFunc_Project_Id() +"'";
 				break;
 		   
 		    case 12://删除
-		    	Sql = " delete from dev_gj where id = '"+ Id +"' ";
+		    	Sql = " delete from dev_gj where id = '"+ Id +"' and project_id = '" + currStatus.getFunc_Project_Id() + "'";
 		    	break;
 		    
 		    case 15://地图拖拽同步更新
 				Sql = " update dev_gj t set t.longitude = '"+ Longitude +"', t.latitude = '"+ Latitude +"' " +
-					  " where t.id = '"+ Id +"'";
+					  " where t.id = '"+ Id +"' and t.project_id = '"+ Project_Id +"'";
 				break;
 			case 16://删除标注接口
 				Sql = " update dev_gj t set t.sign = '0' " +
-				      " where t.id = '"+ Id +"'";
+				      " where t.id = '"+ Id +"' and t.project_id = '"+ Project_Id +"'";
 				break;
 			case 17://添加标注接口
 				Sql = " update dev_gj t set t.sign = '1', t.longitude = '"+ Longitude +"', t.latitude = '"+ Latitude +"' " +
-					  " where t.id = '"+ Id +"'";
+					  " where t.id = '"+ Id +"' and t.project_id = '"+ Project_Id +"'";
 				break;
 			case 21://获取已标注管井
 				Sql = "{? = call Func_GJ_Get('"+ Id +"')}";
@@ -616,12 +809,7 @@ public class DevGJBean extends RmiBean
 			case 23://获取未标注管井
 				Sql = "{? = call Func_UnMark_GJ_Get('"+ Project_Id +"')}";
 				break;
-			case 24://GIS实时通知
-				Sql = "{? = call Func_News_GJ_Get('"+ Id +"')}";
-				break;
-			case 40://编辑设备EquipInfo
-				Sql = "{call pro_update_dev_gj('" + Equip_Id + "', '" + Equip_Name + "', '" + Id + "')}";
-				break;
+			
 		}
 		return Sql;
 	}
@@ -723,8 +911,7 @@ public class DevGJBean extends RmiBean
 	private String Sid;
 	
 	
-	
-	
+
 	public String getSubsys_Id() {
 		return Subsys_Id;
 	}

@@ -32,48 +32,19 @@ public class EquipInfoBean extends RmiBean
 		currStatus = (CurrStatus)request.getSession().getAttribute("CurrStatus_" + Sid);
 		currStatus.getHtmlData(request, pFromZone);
 		
+		msgBean = pRmi.RmiExec(currStatus.getCmd(), this, 0, 25);
 		switch(currStatus.getCmd())
 		{
-			case 10://添加
+			case 40://添加/编辑
 				currStatus.setResult(MsgBean.GetResult(msgBean.getStatus()));
-				if(G_Id.contains("WJ") || G_Id.contains("YJ")){
-					DevGJBean devGJBean = new DevGJBean();
-					devGJBean.setId(G_Id);           //GJ_id
-					devGJBean.setEquip_Id(Id);       //equip_id
-					devGJBean.setEquip_Name(CName);  //equip_name
-					msgBean = pRmi.RmiExec(40, devGJBean, 0, 25);
-				}else{
-					DevGXBean devGXBean = new DevGXBean();
-					devGXBean.setId(G_Id);           //GX_id
-					devGXBean.setEquip_Id(Id);       //equip_id
-					devGXBean.setEquip_Name(CName);  //equip_name
-					msgBean = pRmi.RmiExec(40, devGXBean, 0, 25);
-				}
-				msgBean = pRmi.RmiExec(0, this, 0, 25);
-				request.getSession().setAttribute("Equip_Info_" + Sid, ((Object)msgBean.getMsg()));
-		    	currStatus.setJsp("Equip_Info.jsp?Sid=" + Sid);	
-				break;
-			case 11://编辑
-				currStatus.setResult(MsgBean.GetResult(msgBean.getStatus()));
-				if(G_Id.contains("WJ") || G_Id.contains("YJ")){
-					DevGJBean devGJBean = new DevGJBean();
-					devGJBean.setId(G_Id);           //GJ_id
-					devGJBean.setEquip_Id(Id);       //equip_id
-					devGJBean.setEquip_Name(CName);  //equip_name
-					msgBean = pRmi.RmiExec(40, devGJBean, 0, 25);
-				}else{
-					DevGXBean devGXBean = new DevGXBean();
-					devGXBean.setId(G_Id);           //GX_id
-					devGXBean.setEquip_Id(Id);       //equip_id
-					devGXBean.setEquip_Name(CName);  //equip_name
-					msgBean = pRmi.RmiExec(40, devGXBean, 0, 25);
-				}
 				msgBean = pRmi.RmiExec(0, this, 0, 25);
 			case 0://查询
-				msgBean = pRmi.RmiExec(0, this, 0, 25);
+			case 1:
 		    	request.getSession().setAttribute("Equip_Info_" + Sid, ((Object)msgBean.getMsg()));
 		    	
-		    	
+		    	DevGJBean devGJBean = new DevGJBean();
+		    	msgBean = pRmi.RmiExec(1, devGJBean, 0, 25);
+		    	request.getSession().setAttribute("DevGJ_All_" + Sid, ((Object)msgBean.getMsg()));		    	
 		    	currStatus.setJsp("Equip_Info.jsp?Sid=" + Sid);		    
 		    	break;
 		}
@@ -122,10 +93,17 @@ public class EquipInfoBean extends RmiBean
 				Sql = " select  t.id, t.cname, t.project_Id, t.project_name, t.g_id " +
 					  " from view_equip_info t order by t.id";
 				break;
+			case 3://User设备查询                
+				Sql = " select  t.id, t.cname, t.project_Id, t.project_name, t.g_id " +
+					  " from view_equip_info t where t.project_Id='" + currStatus.getFunc_Project_Id() + "'  order by t.id";
+				break;	
 			case 2://设备ID检测
 				Sql = " select  t.id, t.cname, t.project_Id, t.project_name, t.g_id " +
 					  " from view_equip_info t " +
 					  " where upper(Id) = upper('"+ Id +"') ";
+				break;
+			case 40://编辑设备EquipInfo
+				Sql = "{call pro_update_equip('" + Id + "', '" + CName + "', '" + Pre_Id + "', '" + Pre_Project_Id + "', '" + After_Id + "', '" + After_Project_Id + "')}";
 				break;
 		}
 		return Sql;
@@ -160,6 +138,10 @@ public class EquipInfoBean extends RmiBean
 			setProject_Name(CommUtil.StrToGB2312(request.getParameter("Project_Name")));
 			setG_Id(CommUtil.StrToGB2312(request.getParameter("G_Id")));
 			setSid(CommUtil.StrToGB2312(request.getParameter("Sid")));
+			setPre_Id(CommUtil.StrToGB2312(request.getParameter("Pre_Id")));
+			setPre_Project_Id(CommUtil.StrToGB2312(request.getParameter("Pre_Project_Id")));
+			setAfter_Id(CommUtil.StrToGB2312(request.getParameter("After_Id")));
+			setAfter_Project_Id(CommUtil.StrToGB2312(request.getParameter("After_Project_Id")));
 		}
 		catch (Exception Exp)
 		{
@@ -175,8 +157,44 @@ public class EquipInfoBean extends RmiBean
 	private String G_Id;
 	
 	private String Sid;
-
+	private String Pre_Id;
+	private String After_Id;
+	private String Pre_Project_Id;
+	private String After_Project_Id;
+    
 	
+	public String getPre_Id() {
+		return Pre_Id;
+	}
+
+	public void setPre_Id(String pre_Id) {
+		Pre_Id = pre_Id;
+	}
+
+	public String getAfter_Id() {
+		return After_Id;
+	}
+
+	public void setAfter_Id(String after_Id) {
+		After_Id = after_Id;
+	}
+
+	public String getPre_Project_Id() {
+		return Pre_Project_Id;
+	}
+
+	public void setPre_Project_Id(String pre_Project_Id) {
+		Pre_Project_Id = pre_Project_Id;
+	}
+
+	public String getAfter_Project_Id() {
+		return After_Project_Id;
+	}
+
+	public void setAfter_Project_Id(String after_Project_Id) {
+		After_Project_Id = after_Project_Id;
+	}
+
 	public String getG_Id() {
 		return G_Id;
 	}

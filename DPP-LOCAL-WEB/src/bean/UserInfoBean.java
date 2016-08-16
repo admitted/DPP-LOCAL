@@ -87,14 +87,14 @@ public class UserInfoBean extends RmiBean
 					
 					
 					//设备信息
-					EquipInfoBean equipmentInfoBean = new EquipInfoBean();
-					msgBean = pRmi.RmiExec(0, equipmentInfoBean, 0, 25);
-					request.getSession().setAttribute("Equip_Info_" + Sid, (Object)msgBean.getMsg());
+//					EquipInfoBean equipmentInfoBean = new EquipInfoBean();
+//					msgBean = pRmi.RmiExec(0, equipmentInfoBean, 0, 25);
+//					request.getSession().setAttribute("Equip_Info_" + Sid, (Object)msgBean.getMsg());
 					
 					//管井查询-无分页
-					DevGJBean devGJBean = new DevGJBean();
-					msgBean = pRmi.RmiExec(1, devGJBean, 0, 25); 
-					request.getSession().setAttribute("Map_GJ_" + Sid, (Object)msgBean.getMsg());
+//					DevGJBean devGJBean = new DevGJBean();
+//					msgBean = pRmi.RmiExec(1, devGJBean, 0, 0); 
+//					request.getSession().setAttribute("Map_GJ_" + Sid, (Object)msgBean.getMsg());
 					
 					/*//管线查询
 					DevGXBean GXList = new DevGXBean();
@@ -124,9 +124,10 @@ public class UserInfoBean extends RmiBean
 					}
 					
 					//管井查询-无分页
-					DevGJBean devGJBean = new DevGJBean();
-					msgBean = pRmi.RmiExec(1, devGJBean, 0, 25); 
-					request.getSession().setAttribute("User_Map_GJ_" + Sid, (Object)msgBean.getMsg());
+//					DevGJBean devGJBean = new DevGJBean();
+//					devGJBean.currStatus = this.currStatus;
+//					msgBean = pRmi.RmiExec(1, devGJBean, 0, 25); 
+//					request.getSession().setAttribute("User_Map_GJ_" + Sid, (Object)msgBean.getMsg());
 					
 					//项目信息
 					ProjectInfoBean projectInfoBean = new ProjectInfoBean();
@@ -142,11 +143,13 @@ public class UserInfoBean extends RmiBean
 					currStatus.setTotalRecord(msgBean.getCount());*/
 					
 			    	//管理权限
-					UserRoleBean roleBean = new UserRoleBean();
-			    	msgBean = pRmi.RmiExec(1, roleBean, 0, 25);
-			    	request.getSession().setAttribute("User_Manage_Role_" + Sid, ((Object)msgBean.getMsg()));
+//					UserRoleBean roleBean = new UserRoleBean();
+//			    	msgBean = pRmi.RmiExec(1, roleBean, 0, 25);
+//			    	request.getSession().setAttribute("User_Manage_Role_" + Sid, ((Object)msgBean.getMsg()));
 
-			    	Url = "user/MapMain.jsp?Sid=" + Sid;
+			    	Url = "User_Project_Option.jsp?Sid=" + Sid;
+				//	Url = "user/MapMain.jsp?Sid=" + Sid;
+					
 				}
 			}
 			else

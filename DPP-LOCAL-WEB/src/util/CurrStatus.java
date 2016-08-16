@@ -21,9 +21,9 @@ public class CurrStatus implements Serializable
 	private String Func_Sub_Type_Id;  //雨/污              1：雨、    2：污
 	
 	private Vector<Object> VecDate;
-	private String Result = null;     //
-	private int Curr_Status;          //当前状态
-	private String Jsp;               //保存jsp地址
+	private String Result = null;    //
+	private int Curr_Status;         //当前状态
+	private String Jsp;              //保存jsp地址
 
 	
 	public String getFunc_Sort_Id() {

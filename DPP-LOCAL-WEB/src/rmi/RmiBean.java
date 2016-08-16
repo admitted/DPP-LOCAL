@@ -35,7 +35,7 @@ public abstract class RmiBean implements Serializable
 	public static final int RMI_DATA			        = 30;
 	public static final int	RMI_DATAGJ					= 31;
 	public static final int	RMI_DATAGX					= 32;
-	
+
 	public MsgBean    msgBean = null;
 	public String     className;
 	public CurrStatus currStatus = null;

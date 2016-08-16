@@ -3,24 +3,20 @@ package bean;
 import net.appsvr.AppDeviceDataReqBean;
 import util.*;
 
-/**
- * @author cui
- *
- */
 public abstract class BaseCmdBean
 {
-	public static long m_SessionId = (new java.util.Date().getTime()/1000); //  此刻时间长
-	private String actionSource = "";  //动作源   Cpm_Id
-	private String Reserve = "";       //预留
-	private String Status = "0000";    //状态
+	public static long m_SessionId = (new java.util.Date().getTime()/1000);
+	private String actionSource = "";
+	private String Reserve = "";
+	private String Status = "0000";
 	private int Action = 0;	
-	private int TestTime = (int)(new java.util.Date().getTime()/1000);      //  测试时间
+	private int TestTime = (int)(new java.util.Date().getTime()/1000);
 	private String Seq = "";
 	public DBUtil m_DbUtil = null;
 	
 	public BaseCmdBean(int action, String seq, DBUtil dbUtil){
-		Action   = action;
-		Seq      = seq;
+		Action = action;
+		Seq = seq;
 		m_DbUtil = dbUtil;
 	}
 	

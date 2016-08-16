@@ -107,6 +107,7 @@ public abstract class TcpSvrBase extends Thread {
 
 	// 如果收到关闭指令，就关闭SOCKET和释放资源
 	protected abstract void ClientStatusNotify(String strClientKey, int Status);
+
 	protected abstract void ClientClose(String pClientKey);
 
 	// 取得接收线程数据列表
@@ -346,7 +347,7 @@ public abstract class TcpSvrBase extends Thread {
 
 			private byte DeCode(byte[] pMsg, Vector<Object> vectData) {
 				byte RetVal = CmdUtil.CODEC_ERR;
-				int nUsed = ((Integer) vectData.get(0)).intValue();  // 现有的数据长度
+				int nUsed = ((Integer) vectData.get(0)).intValue();// 现有的数据长度
 				int nCursor = ((Integer) vectData.get(1)).intValue();// 从什么地方开始
 				try {
 					DataInputStream DinStream = new DataInputStream(

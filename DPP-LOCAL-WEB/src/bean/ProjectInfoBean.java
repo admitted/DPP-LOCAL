@@ -1,11 +1,14 @@
 package bean;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import rmi.Rmi;
 import rmi.RmiBean;
 import util.*;
@@ -46,6 +49,38 @@ public class ProjectInfoBean extends RmiBean
 	   	response.sendRedirect(currStatus.getJsp());
 	}
 	
+	//项目ID检测
+	public void IdCheck(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone)
+	{
+		try 
+		{
+			getHtmlData(request);
+			currStatus = (CurrStatus)request.getSession().getAttribute("CurrStatus_" + Sid);
+			currStatus.getHtmlData(request, pFromZone);
+			
+			PrintWriter outprint = response.getWriter();
+			String Resp = "3006";
+			
+			msgBean = pRmi.RmiExec(2, this, 0, 25);//查找是否有该项目存在
+			System.out.println("msgBean.getStatus():" + msgBean.getStatus());
+			switch(msgBean.getStatus())
+			{
+				case 0://已存在
+					Resp = "3006";
+					break;
+				default://可用
+					Resp = "0000";
+					break;
+			}
+			
+			request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
+			outprint.write(Resp);
+		}
+		catch (Exception Ex)
+		{
+			Ex.printStackTrace();
+		}
+	}
 	public String getSql(int pCmd)
 	{
 		String Sql = "";
@@ -54,6 +89,11 @@ public class ProjectInfoBean extends RmiBean
 			case 0://查询
 				Sql = " select  t.id, t.cname, t.Longitude, t.Latitude, t.MapLev , t.MapAngle , t.Demo "
 						+ " from project_info t order by t.id";
+				break;
+			case 2://设备ID检测
+				Sql = " select  t.id, t.cname " +
+					  " from Project_info t " +
+					  " where t.id= '"+ Id +"'";
 				break;
 			case 10://添加
 				Sql = " insert into project_info( id, cname, Longitude, Latitude, MapLev, MapAngle, Demo)" +

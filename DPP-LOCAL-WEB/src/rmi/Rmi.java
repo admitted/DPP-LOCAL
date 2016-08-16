@@ -18,8 +18,8 @@ public interface Rmi extends Remote
 	 * case 2: Function函数调用 ;
 	 * case 3: Package调用 ;   ?oracle.jdbc操作?
 	 * case 4: Producer调用 ;
-	 * @see rmi.Rmi#RmiExec(int, rmi.RmiBean, int, int)
 	 * @param PageSize TODO
+	 * @see rmi.Rmi#RmiExec(int, rmi.RmiBean, int, int)
 	 */
 	public MsgBean RmiExec(int pCmd, RmiBean pBean, int CurrPage, int PageSize) throws RemoteException;
 }

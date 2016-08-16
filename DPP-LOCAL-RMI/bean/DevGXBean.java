@@ -337,12 +337,20 @@ public class DevGXBean extends RmiBean
 			    cell=new Label(3,0,"起端管井",font1);  
 			    sheet.addCell(cell);   
 			    cell=new Label(4,0,"终端管井",font1);  
-			    sheet.addCell(cell);   
-			    cell=new Label(5,0,"材料类型",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(5,0,"起端底标高",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(6,0,"终端底标高",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(7,0,"材料类型",font1);  
+			    sheet.addCell(cell); 
+			    cell=new Label(8,0,"埋设年份",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(9,0,"数据等级",font1);  
+			    sheet.addCell(cell);
+			    cell=new Label(10,0,"所属项目",font1);  
 			    sheet.addCell(cell);  
-			    cell=new Label(6,0,"所属项目",font1);  
-			    sheet.addCell(cell);  
-			    cell=new Label(7,0,"设备名称",font1);  
+			    cell=new Label(11,0,"设备名称",font1);  
 			    sheet.addCell(cell);  
 			    
 				
@@ -355,7 +363,44 @@ public class DevGXBean extends RmiBean
 					Length = devGXBean.getLength();
 					Start_Id = devGXBean.getStart_Id();
 					End_Id = devGXBean.getEnd_Id();
+					Start_Height = devGXBean.getStart_Height();
+					End_Height = devGXBean.getEnd_Height();
 					Material = devGXBean.getMaterial();
+					Buried_Year = devGXBean.getBuried_Year();
+					Data_Lev = "";
+					try{
+						if(devGXBean.getData_Lev() != null && !devGXBean.getData_Lev().trim().equals("")){
+						  	switch(Integer.parseInt(devGXBean.getData_Lev())){
+					  		case 1:
+					  			Data_Lev ="人工插值";
+					  			break;
+					  		case 2:
+						  		Data_Lev ="原始探测";
+						  		break;
+					  		case 3:
+						  		Data_Lev ="竣工图数据";
+						  		break;
+					  		case 4:
+						  		Data_Lev ="人工插值经过现场校验";
+						  		break;
+					  		case 5:
+						  		Data_Lev ="原始探测经过二次校验";
+						  		break;
+					  		case 6:
+						  		Data_Lev ="可疑数据";
+						  		break;
+					  		default:
+						  		Data_Lev ="数据有误，需要更改！";
+							  		break;
+						  	}
+						}
+					}catch(Exception e){
+					  	Data_Lev ="数据有误，需要更改！";
+					}finally{
+					  	if(Data_Lev == null){
+					  		Data_Lev ="";
+					  	}
+					}
 					Curr_Data = devGXBean.getCurr_Data();
 					Project_Name = devGXBean.getProject_Name();
 					Equip_Name = devGXBean.getEquip_Name();
@@ -373,11 +418,19 @@ public class DevGXBean extends RmiBean
 					sheet.addCell(cell);
 					cell = new Label(4, row_Index, End_Id, font2);
 					sheet.addCell(cell);
-					cell = new Label(5, row_Index, Material, font2);
+					cell = new Label(5, row_Index, Start_Height, font2);
 					sheet.addCell(cell);
-					cell = new Label(6, row_Index, Project_Name, font2);
+					cell = new Label(6, row_Index, End_Height, font2);
 					sheet.addCell(cell);
-					cell = new Label(7, row_Index, Equip_Name, font2);
+					cell = new Label(7, row_Index, Material, font2);
+					sheet.addCell(cell);
+					cell = new Label(8, row_Index, Buried_Year, font2);
+					sheet.addCell(cell);
+					cell = new Label(9, row_Index, Data_Lev, font2);
+					sheet.addCell(cell);
+					cell = new Label(10, row_Index, Project_Name, font2);
+					sheet.addCell(cell);
+					cell = new Label(11, row_Index, Equip_Name, font2);
 					sheet.addCell(cell);
 
 				}
@@ -416,27 +469,28 @@ public class DevGXBean extends RmiBean
 						Sql = " select t.id, t.diameter, t.length, t.start_id, t.end_id, t.start_height, t.end_height, t.material, t.buried_year, t.data_lev, t.project_id, t.project_name, t.equip_id, t.equip_name ,round((t.curr_data),2)" +
 				    	 	   	  " from view_dev_gx t " +		
 				    	 	   	  " where t.id like  '%"+ currStatus.getFunc_Sub_Type_Id() +"%'" +  
-				    	 	   	  " and t.project_id like '" + Project_Id + "%' " +
+				    	 	   	  " and t.project_id like '" + currStatus.getFunc_Project_Id() + "%' " +
 			 	 		          " order by t.id ";
 						break;
 					case 2://按照直径排序
 						Sql = " select t.id, t.diameter, t.length, t.start_id, t.end_id, t.start_height, t.end_height, t.material, t.buried_year, t.data_lev, t.project_id, t.project_name, t.equip_id, t.equip_name ,round((t.curr_data),2)" +
 			    	 	   	  " from view_dev_gx t " +		
 			    	 	   	  " where t.id like  '%"+ currStatus.getFunc_Sub_Type_Id() +"%'" +  
-			    	 	   	  " and t.project_id like '" + Project_Id + "%' " +
+			    	 	   	  " and t.project_id like '" + currStatus.getFunc_Project_Id() + "%' " +
 		 	 		          " order by t.diameter ";
 				       break;
 				    case 3://按照材料排序
 						Sql = " select t.id, t.diameter, t.length, t.start_id, t.end_id, t.start_height, t.end_height, t.material, t.buried_year, t.data_lev, t.project_id, t.project_name, t.equip_id, t.equip_name ,round((t.curr_data),2)" +
 			    	 	   	  " from view_dev_gx t " +		
 			    	 	   	  " where t.id like '%"+ currStatus.getFunc_Sub_Type_Id() +"%'" +
-			    	 	   	  " and t.project_id like '" + Project_Id + "%' " +
+			    	 	   	  " and t.project_id like '" + currStatus.getFunc_Project_Id() + "%' " +
 		 	 		          " order by FIELD(t.material, 'PE', '混凝土') desc";
 					   break;
 				}
 				break;
   
 		    case 3://查询(单个)
+		    case 5:
 				Sql = " select t.id, t.diameter, t.length, t.start_id, t.end_id, t.start_height, t.end_height, t.material, t.buried_year, t.data_lev, t.project_id, t.project_name, t.equip_id, t.equip_name ,round((t.curr_data),2)" +
 	    	 	   	  " from view_dev_gx t " +		
 	    	 	   	  " where t.id = '"+ Id +"'" ;	 		         

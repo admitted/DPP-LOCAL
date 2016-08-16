@@ -166,7 +166,7 @@ public class DataGXBean extends RmiBean
 			case 0://实时数据 (GIS表格)
 				Sql = " select '' AS sn, t.project_id, t.project_name, t.GX_id, t.GX_name, t.attr_name, t.ctime, t.value, t.unit, t.lev, t.des, t.length, t.diameter, t.material" +
 					  " FROM view_data_now_gx t " +
-					  " where t.project_id = "+ Project_Id + 
+					  " where t.project_id = "+ currStatus.getFunc_Project_Id() + 
 					  " and t.gx_id like '%" + currStatus.getFunc_Sub_Type_Id() + "%' " +
 					  " ORDER BY t.project_id, t.GX_id";
 				break;
@@ -175,6 +175,7 @@ public class DataGXBean extends RmiBean
 				Sql = " select '' AS sn, t.project_id, t.project_name, t.GX_id, t.GX_name, t.attr_name, t.ctime, round(avg(t.value),2), t.unit, t.lev, t.des, t.length, t.diameter, t.material " +
 					  " FROM view_data_gx t  " +
 					  " where t.gx_id = '"+ GX_Id +"'" + 
+					  "   and t.project_id = '" + currStatus.getFunc_Project_Id() + "'" +
 					  "   and t.ctime >= date_format('" + SqlBTime + "', '%Y-%m-%d %H-%i-%S')" +
 				  	  "   and t.ctime <= date_format('" + SqlETime + "', '%Y-%m-%d %H-%i-%S')" +
 					  " GROUP BY SUBSTR(ctime,1,13)" +
@@ -184,6 +185,7 @@ public class DataGXBean extends RmiBean
 				Sql = " select '' AS sn, t.project_id, t.project_name, t.GX_id, t.GX_name, t.attr_name, t.ctime, round(avg(t.value),2), t.unit, t.lev, t.des, t.length, t.diameter, t.material " +
 					  " FROM view_data_gx t  " +
 					  " where t.gx_id = '"+ GX_Id +"'" + 
+					  "   and t.project_id = '" + currStatus.getFunc_Project_Id() + "'" +
 					  "   and t.ctime >= date_format('" + SqlBTime+"', '%Y-%m-%d %H-%i-%S')" +
 				  	  "   and t.ctime <= date_format('" + SqlETime+"', '%Y-%m-%d %H-%i-%S')" +
 					  " GROUP BY SUBSTR(ctime,1,10)" +
@@ -193,6 +195,7 @@ public class DataGXBean extends RmiBean
 				Sql = " select '' AS sn, t.project_id, t.project_name, t.GX_id, t.GX_name, t.attr_name, t.ctime, round(avg(t.value),2), t.unit, t.lev, t.des, t.length, t.diameter, t.material " +
 					  " FROM view_data_gx t  " +
 					  " where t.gx_id = '"+ GX_Id +"'" + 
+					  "   and t.project_id = '" + currStatus.getFunc_Project_Id() + "'" +
 					  "   and t.ctime >= date_format('" + SqlBTime+"', '%Y-%m-%d %H-%i-%S')" +
 				  	  "   and t.ctime <= date_format('" + SqlETime+"', '%Y-%m-%d %H-%i-%S')" +
 					  " GROUP BY SUBSTR(ctime,1,10)" +

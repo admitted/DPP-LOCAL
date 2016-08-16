@@ -175,7 +175,9 @@ public class MainServlet extends HttpServlet
         else if (strUrl.equalsIgnoreCase("Admin_User_RoleOP.do"))				     //人员权限-编辑
         	new UserRoleBean().RoleOP(request, response, m_Rmi, false);
         else if (strUrl.equalsIgnoreCase("Admin_Project_Info.do"))	                 //项目信息管理
-        	new ProjectInfoBean().ExecCmd(request, response, m_Rmi, false);     
+        	new ProjectInfoBean().ExecCmd(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Project_IdCheck.do"))						 //项目ID检测
+        	new ProjectInfoBean().IdCheck(request, response, m_Rmi, false);
         else if (strUrl.equalsIgnoreCase("Admin_Equip_Info.do"))	                 //设备信息管理
         	new EquipInfoBean().ExecCmd(request, response, m_Rmi, false); 
         else if (strUrl.equalsIgnoreCase("Equip_IdCheck.do"))						 //设备ID检测
@@ -194,6 +196,10 @@ public class MainServlet extends HttpServlet
         	new DevGJBean().ImportExcel(request, response, m_Rmi, false, Config);
         else if (strUrl.equalsIgnoreCase("Admin_Import_GD.do"))					//Excel表导入管道（新）
         	new DevGXBean().ImportExcel(request, response, m_Rmi, false, Config);
+        else if (strUrl.equalsIgnoreCase("Admin_Update_GJ.do"))					//Excel表更新管井（新）
+        	new DevGJBean().UpdateExcel(request, response, m_Rmi, false, Config);
+        else if (strUrl.equalsIgnoreCase("Admin_Update_GD.do"))					//Excel表更新管道（新）
+        	new DevGXBean().UpdateExcel(request, response, m_Rmi, false, Config);
         else if (strUrl.equalsIgnoreCase("Admin_File_GJ_Export.do"))			//管井Excel表导出
         	new DevGJBean().XLQRExcel(request, response, m_Rmi, false);  
         else if (strUrl.equalsIgnoreCase("Admin_File_GX_Export.do"))			//管线Excel表导出
