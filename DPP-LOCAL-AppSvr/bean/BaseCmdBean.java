@@ -1,8 +1,6 @@
 package bean;
 
-import net.TcpSvrBase;
-import net.appsvr.AppDeviceDataReqBean;
-import net.appsvr.RmiDeviceDataReqBean;
+import net.MsgCtrl;
 import util.*;
 
 public abstract class BaseCmdBean
@@ -15,24 +13,26 @@ public abstract class BaseCmdBean
 	private int TestTime = (int)(new java.util.Date().getTime()/1000);
 	private String Seq = "";
 	public DBUtil m_DbUtil = null;
-	
-	public BaseCmdBean(int action, String seq, DBUtil dbUtil){
+	private String BeanName = "";
+
+	public BaseCmdBean(int action, String seq){
 		Action = action;
 		Seq = seq;
-		m_DbUtil = dbUtil;
 	}
 	
-	public static BaseCmdBean getBean(int Cmd, DBUtil dbUtil)
+	public static BaseCmdBean getBean(int Cmd, String Seq)
 	{
 		BaseCmdBean retBean = null;
 		switch(Cmd)
 		{
 			case Cmd_Sta.CMD_SUBMIT_1001:
-				retBean = new AppDeviceDataReqBean(Cmd, SessionId(), dbUtil);
+				retBean = new AppDeviceDataReqBean(Cmd, Seq);
 				break;
 			case Cmd_Sta.CMD_SUBMIT_0001:
+				retBean = new DTURestartBean(Cmd, Seq);
+				break;
 			case Cmd_Sta.CMD_SUBMIT_0002:
-				retBean = new RmiDeviceDataReqBean(Cmd, SessionId(), dbUtil);
+				retBean = new DTUUpdateTimeBean(Cmd, Seq);
 				break;
 		}
 		return retBean;
@@ -47,10 +47,10 @@ public abstract class BaseCmdBean
 		return Seq;
 	}
 	public abstract void parseReqest(String key, String strRequest, byte[] strData);
-	public abstract int execRequest(TcpSvrBase tcpSvr);
+	public abstract int execRequest(MsgCtrl msgCtrl);
 
 	public abstract void parseReponse(String strResponse);
-	public abstract void execResponse();
+	public abstract void execResponse(MsgCtrl msgCtrl);
 	
 	public abstract void noticeTimeOut();
 	public String getActionSource() {
@@ -105,5 +105,13 @@ public abstract class BaseCmdBean
 	{
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public String getBeanName() {
+		return BeanName;
+	}
+
+	public void setBeanName(String beanName) {
+		BeanName = beanName;
 	}
 }

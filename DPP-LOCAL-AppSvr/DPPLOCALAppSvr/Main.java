@@ -2,16 +2,20 @@ package DPPLOCALAppSvr;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
 import org.apache.log4j.PropertyConfigurator;
+
 import container.ActionContainer;
-import net.appsvr.TcpSvrAppGateWay;
+import net.*;
 import util.*;
 
 public class Main extends Thread 
 {
 	private static Main objMain = null;
-	private TcpSvrAppGateWay m_PlatSvr = null;
-	private DBUtil m_DBUtil = null;
+	
+	private DBUtil m_DBUtil = null;				//数据库
+	private TcpSvr m_TcpSvr = null;				//Svr	
+	private MsgCtrl m_MsgCtrl = null;			//Svr消息控制
 	public static void main(String[] args) 
 	{
 		objMain = new Main();
@@ -29,20 +33,27 @@ public class Main extends Thread
 				System.exit(-1);
 			}
 			
-			//数据库组件
+			//数据库初始化
 			m_DBUtil = new DBUtil();
 			if(!m_DBUtil.init())
 			{
 				System.exit(-1);
 			}
-
-			m_PlatSvr = new TcpSvrAppGateWay(m_DBUtil);
-			if(!m_PlatSvr.Initialize())
+			//TCPSVR初始化
+			m_TcpSvr = new TcpSvr(m_DBUtil);
+			if(!m_TcpSvr.init())
 			{
-				System.out.println("m_PlatSvr Failed======");
+				System.out.println("m_TcpSvr Failed======");
 				System.exit(-3);
 			}
-			
+			//消息控制初始化
+			m_MsgCtrl = new MsgCtrl(m_TcpSvr, m_DBUtil);
+			if(!m_MsgCtrl.Initialize())
+			{
+				System.out.println("m_MsgCtrl Failed======");
+				System.exit(0);
+			}
+
 			this.start();
 			Runtime.getRuntime().addShutdownHook(new Thread(){
 				public void run() {
@@ -60,26 +71,19 @@ public class Main extends Thread
 	public void run() 
 	{
 		System.out.println("Start..........................................");
-		String inputCmd = null;
-		boolean test = true;
 		while (!interrupted()) 
 		{
-			try 
-			{
+			try {
 				sleep(1000);	
-				if(test)
+				if(true)
 					continue;
-				BufferedReader bufReader = new BufferedReader(new InputStreamReader(System.in));
-				inputCmd = bufReader.readLine().toLowerCase();
-				if (inputCmd.equals("t")) 
-				{
-					
-				}
-			} 
-			catch (Exception exp) 
-			{
+				@SuppressWarnings("unused")
+				String inputCmd = new BufferedReader(new InputStreamReader(System.in)).readLine().toLowerCase();
+				System.out.println();
+				
+			} catch (Exception exp) {
 				exp.printStackTrace();
 			}
-		}
+		}	
 	}
 }

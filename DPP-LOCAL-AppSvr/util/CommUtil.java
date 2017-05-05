@@ -346,6 +346,34 @@ public class CommUtil
 		} 
 		return retVal;
 	}
+	public static String getDateTime()
+	{
+		String retVal = "";
+		try
+		{
+			SimpleDateFormat SimFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+			retVal = SimFormat.format(new Date());
+		}
+		catch(Exception ex)
+		{
+			 ex.printStackTrace();
+		} 
+		return retVal;
+	}
+	public static String getHourOfTime()
+	{
+		String retVal = "";
+		try
+		{
+			SimpleDateFormat SimFormat = new SimpleDateFormat("yyyy-MM-dd HH:00:00"); 
+			retVal = SimFormat.format(new Date());
+		}
+		catch(Exception ex)
+		{
+			 ex.printStackTrace();
+		} 
+		return retVal;
+	}
 //*******************整型转换成其它类型********************************
 	/*
 	 * 整数转换成Hex字符串， 其中length为转换后的Hex宽度

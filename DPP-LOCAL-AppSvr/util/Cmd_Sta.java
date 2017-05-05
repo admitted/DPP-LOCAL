@@ -23,8 +23,8 @@ public class Cmd_Sta
 	public static final byte CODEC_ERR       = 4;
 
 //	==========================AppSvr ~ CPM========================================
-	public static final int CMD_SUBMIT_0001	 				= 0001;
-	public static final int CMD_SUBMIT_0002	 				= 0002;
+	public static final int CMD_SUBMIT_0001	 				= 0001;//重启指令
+	public static final int CMD_SUBMIT_0002	 				= 0002;//对时指令
 	public static final int CMD_SUBMIT_1000	 				= 1000;
 	public static final int CMD_SUBMIT_1001	 				= 1001;
 	public static final int CMD_SUBMIT_1003	 				= 1003;
