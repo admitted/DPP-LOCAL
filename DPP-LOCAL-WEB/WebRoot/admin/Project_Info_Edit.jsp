@@ -13,11 +13,9 @@
 <script language=javascript>document.oncontextmenu=function(){window.event.returnValue=false;};</script>
 </head>
 <%
-	
-	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
-	CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-  ArrayList    Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
-
+	String     Sid          =  CommUtil.StrToGB2312(request.getParameter("Sid"));
+	CurrStatus currStatus   = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+  ArrayList  Project_Info = (ArrayList)session.getAttribute("Project_Info_" + Sid);
  	String Id = request.getParameter("Id");
   String CName = "";
   String Longitude = "";
@@ -39,7 +37,6 @@
 					MapLev = statBean.getMapLev();
 					MapAngle = statBean.getMapAngle();
 					Demo = statBean.getDemo();
-					
 			}
 		}
  	} 
@@ -47,7 +44,7 @@
 <body style="background:#CADFFF">
 <form name="Project_Info_Edit"  action="Admin_Project_Info.do" method="post" target="mFrame" enctype="multipart/form-data">
 <div id="down_bg_2">
-	<div id="cap"><img src="../skin/images/cap_user_info.gif"></div><br><br><br>
+	<div id="cap"><img src="../skin/images/project_info.gif"></div><br><br><br>
 	<div id="right_table_center">
 		<table width="60%" style='margin:auto;' border=0 cellPadding=0 cellSpacing=0 bordercolor="#3491D6" borderColorDark="#ffffff">
 			<tr height='30'>
@@ -66,7 +63,7 @@
 							</td>
 							<td width='20%' align='center'>项目名称</td>
 							<td width='30%' align='left'>
-								<input type='text' name='CName' style='width:96%;height:20px;' value='<%=CName%>' maxlength='6'>
+								<input type='text' name='CName' style='width:96%;height:20px;' value='<%=CName%>' maxlength='11'>
 							</td>
 						</tr>
 						<tr height='30'>
@@ -93,7 +90,7 @@
 						<tr height='30'>
 							<td width='20%' align='center'>项目描述</td>
 							<td width='30%' align='left'>
-								<input type='text' name='Demo' style='width:96%;height:20px;' value='<%=Demo%>' maxlength='11'>
+								<input type='text' name='Demo' style='width:96%;height:20px;' value='<%=Demo%>' maxlength='21'>
 							</td>
 						</tr>		
 					</table>
@@ -125,7 +122,6 @@ function doNO()
 
 function doEdit()
 {
-
   if(Project_Info_Edit.CName.value.Trim().length < 1)
   {
     alert("请输入姓名!");
@@ -134,7 +130,7 @@ function doEdit()
 
   if(confirm("信息无误,确定编辑?"))
   {
-  	location = "Project_Info.do?Cmd=11&Id=<%=Id%>&Sid=<%=Sid%>&CName="
+  	location = "Admin_Project_Info.do?Cmd=11&Id=<%=Id%>&Sid=<%=Sid%>&CName="
   	         + Project_Info_Edit.CName.value
   	         + "&Longitude=" + Project_Info_Edit.Longitude.value
   	         + "&Latitude=" + Project_Info_Edit.Latitude.value

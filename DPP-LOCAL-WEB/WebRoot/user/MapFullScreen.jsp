@@ -30,6 +30,7 @@ html,body{width:100%; height:100%; margin:0; padding:0;}
 </style>
 </head>
 <%
+	
 	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
   UserInfoBean UserInfo        = (UserInfoBean)session.getAttribute("UserInfo_" + Sid);
   ArrayList User_FP_Role       = (ArrayList)session.getAttribute("User_FP_Role_" + Sid);
@@ -37,8 +38,13 @@ html,body{width:100%; height:100%; margin:0; padding:0;}
 	ArrayList User_Device_Detail = (ArrayList)session.getAttribute("User_Device_Detail_" + Sid);
 	
 	//È¨ÏÞÉèÖÃ
-	String FpId = UserInfo.getFp_Role();
-	String ManageId = UserInfo.getManage_Role();
+	String FpId = "";
+	String ManageId = "";
+  if(null != UserInfo)
+  {
+		FpId = UserInfo.getFp_Role();
+		ManageId = UserInfo.getManage_Role();
+	}
 	String FpList = "";
 	String IdList = "";
 	
@@ -47,11 +53,11 @@ html,body{width:100%; height:100%; margin:0; padding:0;}
 		Iterator roleiter = User_FP_Role.iterator();
 		while(roleiter.hasNext())
 		{
-	UserRoleBean roleBean = (UserRoleBean)roleiter.next();
-	if(roleBean.getId().equals(FpId) && null != roleBean.getPoint())
-	{
-		FpList = roleBean.getPoint();
-	}
+			UserRoleBean roleBean = (UserRoleBean)roleiter.next();
+			if(roleBean.getId().equals(FpId) && null != roleBean.getPoint())
+			{
+				FpList = roleBean.getPoint();
+			}
 		}
 	}
 	
@@ -60,11 +66,11 @@ html,body{width:100%; height:100%; margin:0; padding:0;}
 		Iterator roleiter = User_Manage_Role.iterator();
 		while(roleiter.hasNext())
 		{
-	UserRoleBean roleBean = (UserRoleBean)roleiter.next();
-	if(roleBean.getId().substring(0,4).equals(ManageId) && roleBean.getId().length() == 8 && roleBean.getPoint() != null)
-	{
-		IdList += roleBean.getPoint();
-	}
+			UserRoleBean roleBean = (UserRoleBean)roleiter.next();
+			if(roleBean.getId().substring(0,4).equals(ManageId) && roleBean.getId().length() == 8 && roleBean.getPoint() != null)
+			{
+				IdList += roleBean.getPoint();
+			}
 		}
 	}
 	
@@ -77,19 +83,20 @@ html,body{width:100%; height:100%; margin:0; padding:0;}
 		Iterator deviter = User_Device_Detail.iterator();
 		while(deviter.hasNext())
 		{
-	EquipInfoBean devBean = (EquipInfoBean)deviter.next();
-	if(IdList.contains(devBean.getId()))
-	{
-		sn++;
-		if(1 == sn)
-		{
-			Longitude = Double.parseDouble(devBean.getLongitude());
-			Latitude  = Double.parseDouble(devBean.getLatitude());
-			break;
+			DeviceDetailBean devBean = (DeviceDetailBean)deviter.next();
+			if(IdList.contains(devBean.getId()))
+			{
+				sn++;
+				if(1 == sn)
+				{
+					Longitude = Double.parseDouble(devBean.getLongitude());
+					Latitude  = Double.parseDouble(devBean.getLatitude());
+					break;
+				}
+			}
 		}
 	}
-		}
-	}
+ 	
 %>
 <body style='background:#bbbdbb' scroll='NO'>
 <form name='Map' action='Map.do' method='post' target='mFrame'>

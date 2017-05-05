@@ -7,7 +7,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>百事达排水管网信息管理平台</title>
+<title>城基排水管网信息管理平台</title>
+<link rel="icon" type="image/png" href="../skin/images/logo_58.png">
 <meta http-equiv="x-ua-compatible" content="ie=7"/>
 <link type="text/css" href="../skin/css/style.css" rel="stylesheet"/>
 <script language=javascript>document.oncontextmenu=function(){window.event.returnValue=false;};</script>

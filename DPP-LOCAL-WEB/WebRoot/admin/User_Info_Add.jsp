@@ -13,11 +13,12 @@
 <script language=javascript>document.oncontextmenu=function(){window.event.returnValue=false;};</script>
 </head>
 <%
-
-	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
-	CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-	CorpInfoBean Corp_Info = (CorpInfoBean)session.getAttribute("Corp_Info_" + Sid);
-	ArrayList    Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
+	String Sid               = CommUtil.StrToGB2312(request.getParameter("Sid"));
+	CurrStatus currStatus    = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+	CorpInfoBean Corp_Info   = (CorpInfoBean)session.getAttribute("Corp_Info_" + Sid);
+	ArrayList Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
+	ArrayList FP_Role        = (ArrayList)session.getAttribute("FP_Role_" + Sid);
+	ArrayList Manage_Role    = (ArrayList)session.getAttribute("Manage_Role_" + Sid);
   String Dept = "";
   if(Corp_Info != null)
 	{
@@ -27,13 +28,9 @@
     	Dept = "";
     }
   }
-
-  ArrayList FP_Role = (ArrayList)session.getAttribute("FP_Role_" + Sid);
-  ArrayList Manage_Role = (ArrayList)session.getAttribute("Manage_Role_" + Sid);
-
 %>
 <body style="background:#CADFFF">
-<form name="User_Info_Add"  action="Admin_User_Info.do" method="post" target="mFrame">
+<form name="Admin_User_Info"  action="Admin_User_Info.do" method="post" target="mFrame">
 <div id="down_bg_2">
 	<div id="cap"><img src="../skin/images/cap_user_info.gif"></div><br><br><br>
 	<div id="right_table_center">
@@ -97,32 +94,58 @@
 							<td width='30%' align='left'>
 								<input type="text" name="Birthday" onClick="WdatePicker({readOnly:true})" class="Wdate" maxlength="10" style='width:97%;'>
 							</td>
-							<td width='20%' align='center'>项&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;目</td>
-							<td width='30%' align='left'>
-								<select name="Project_Id" style="width:97%;height:20px"> 
-								<%
- 	                if(Project_Info != null){
-		  								Iterator iterator = Project_Info.iterator();
-											while(iterator.hasNext()){
-											ProjectInfoBean statBean = (ProjectInfoBean)iterator.next();
-											String Pro_Id = statBean.getId();
-											String Pro_Name = statBean.getCName();				
-								%>
-								    <option value="<%=Pro_Id%>"  > <%=Pro_Name%></option>
-								<%
-		    						 }
-									}
-								%>
-								</select>
-							</td>
-						</tr>
-						<tr height='30'>
 							<td width='20%' align='center'>状&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;态</td>
 							<td width='30%' align='left'>
 								<select name='Status' style='width:97%;height:20px'>
 									<option value='0'>启用</option>
 									<option value='1'>注销</option>
 								</select>
+							</td>
+							
+						</tr>
+						<tr height='30'>
+							<td width='20%' align='center'>管理权限</td>							
+							<td width='30%' align='left'>
+								<select name='Manage_Role' style='width:97%;height:20px'>
+								<%
+								if(Manage_Role != null)
+								{
+									Iterator iterator = Manage_Role.iterator();
+									while(iterator.hasNext())
+									{
+										UserRoleBean statBean = (UserRoleBean)iterator.next();
+										if(statBean.getId().length() == 8)
+										{
+										String Role_Id = statBean.getId();
+										String Role_CName = statBean.getCName();
+								%>
+									<option value="<%=Role_Id%>"><%=Role_CName%></option>
+								<%
+										}
+									}
+							 	}
+								%>	
+								</select>		
+							</td>
+							<td width='20%' align='center'>功能权限</td>							
+							<td width='30%' align='left'>
+								<select name='Fp_Role' style='width:97%;height:20px'>
+								<%
+								if(FP_Role != null)
+								{
+									Iterator iterator = FP_Role.iterator();
+									while(iterator.hasNext())
+									{
+										UserRoleBean statBean = (UserRoleBean)iterator.next();
+										String Role_Id = statBean.getId();
+										String Role_CName = statBean.getCName();
+								%>
+									<option value="<%=Role_Id%>"><%=Role_CName%></option>
+								<%
+									}
+							 	}
+								%>	
+								</select>				
 							</td>
 						</tr>
 
@@ -135,7 +158,6 @@
 </div>
 <input name="Cmd" type="hidden" value="10">
 <input name="Sid" type="hidden" value="<%=Sid%>">
-<input name="Func_Corp_Id" type="hidden" value="<%=currStatus.getFunc_Corp_Id()%>">
 </form>
 </body>
 <SCRIPT LANGUAGE=javascript>
@@ -151,6 +173,7 @@ function doCheck(pId)
 	}
 	if(pId.Trim().length > 0 && pId.Trim().length < 2)
 	{
+		 document.getElementById("ErrorMsg").style.color="red";
 		 document.getElementById("ErrorMsg").innerText = " X 需2-20位!";
 		 Flag = 0;
 		 return;
@@ -166,7 +189,7 @@ function doCheck(pId)
   }
 	//设置回调函数
 	req.onreadystatechange = callbackCheckName;
-	var url = "IdCheck.do?Id="+pId+"&Sid=<%=Sid%>&Func_Corp_Id=<%=currStatus.getFunc_Corp_Id()%>";
+	var url = "Admin_IdCheck.do?Id="+pId+"&Sid=<%=Sid%>";
 	req.open("post",url,true);
 	req.send(null);
 	return true;
@@ -180,12 +203,14 @@ function callbackCheckName()
 			var str = "";
 			if(resp != null && resp == '0000')
 			{
+				 document.getElementById("ErrorMsg").style.color="green";
 				 document.getElementById("ErrorMsg").innerText = " √ 可用!";
 				 Flag = 1;
 				 return;
 			}
 			else if(resp != null && resp == '3006')
-			{
+			{ 
+				 document.getElementById("ErrorMsg").style.color="red";
 				 document.getElementById("ErrorMsg").innerText = " X 已存在!";
 				 Flag = 0;
 				 return;
@@ -200,22 +225,22 @@ function doAdd()
   	alert("帐号有误，请重新输入！");
   	return;
   }
-  if(User_Info_Add.Dept_Id.value.Trim().length < 1)
+  if(Admin_User_Info.Dept_Id.value.Trim().length < 1)
   {
     alert("请选择部门!");
     return;
   }
-  if(User_Info_Add.CName.value.Trim().length < 1)
+  if(Admin_User_Info.CName.value.Trim().length < 1)
   {
     alert("请输入姓名!");
     return;
   }
-  if(User_Info_Add.Tel.value.Trim().length < 1)
+  if(Admin_User_Info.Tel.value.Trim().length < 1)
   {
     alert("请输入联系电话!");
     return;
   }
-  if(User_Info_Add.Birthday.value.Trim().length < 1)
+  if(Admin_User_Info.Birthday.value.Trim().length < 1)
   {
     alert("请输入入职时间!");
     return;
@@ -223,7 +248,7 @@ function doAdd()
 
   if(confirm("信息无误,确定添加?"))
   {
-  	User_Info_Add.submit();
+  	Admin_User_Info.submit();
   }
 }
 

@@ -14,42 +14,56 @@
 </head>
 <%
 	
-	String     Sid            = CommUtil.StrToGB2312(request.getParameter("Sid"));
-	CurrStatus currStatus     = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-  ArrayList  Dev_GJ         = (ArrayList)session.getAttribute("Dev_GJ_" + Sid); 
+	String     Sid                = CommUtil.StrToGB2312(request.getParameter("Sid"));
+	CurrStatus currStatus         = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+  ArrayList  Admin_DevGJ_Info   = (ArrayList)session.getAttribute("Admin_DevGJ_Info_" + Sid); 
+  ArrayList  Project_Info       = (ArrayList)session.getAttribute("Project_Info_" + Sid);
+  
  	String Id = request.getParameter("Id"); 
+ 	String Project_Id = "";
  	String Project_Name = "";
  	String Top_Height= "";
  	String Base_Height= "";
+ 	String Size= "";
   String In_Id = "";
   String Out_Id = "";
+  String Flag = "";
   String Material = "";
+  String Data_Lev ="";
   String Equip_Name = "";
-	if(Dev_GJ != null)
+  String Equip_Height = "";
+  String Equip_Tel = "";
+	if(Admin_DevGJ_Info != null)
 	{
-		Iterator iterator = Dev_GJ.iterator();
+		Iterator iterator = Admin_DevGJ_Info.iterator();
 		while(iterator.hasNext())
 		{
 			DevGJBean devGJBean = (DevGJBean)iterator.next();
 			if(devGJBean.getId().equals(Id))
 			{
+				 Project_Id = devGJBean.getProject_Id();
 				 In_Id = devGJBean.getIn_Id();
 				 Out_Id = devGJBean.getOut_Id();	
 				 Project_Name = devGJBean.getProject_Name();
 			 	 Top_Height= devGJBean.getTop_Height();	
+			 	 Size= devGJBean.getSize();
 			 	 Base_Height= devGJBean.getBase_Height();	
 			   Material = devGJBean.getMaterial();	
+			   Data_Lev = devGJBean.getData_Lev();
+			   Flag = devGJBean.getFlag();
 			   Equip_Name = devGJBean.getEquip_Name();
+			   Equip_Height = devGJBean.getEquip_Height();
+			   Equip_Tel = devGJBean.getEquip_Tel();
 			   if(Equip_Name == null ){ Equip_Name = "无";}
 			   			
 			}
 		}
- 	} 
+ 	}
 %>
 <body style="background:#CADFFF" >
-<form name="Dev_GJ_Edit"  method="post" target="mFrame" enctype="multipart/form-data">
+<form name="Admin_DevGJ_InfoEdit"  method="post" target="mFrame" enctype="multipart/form-data">
 <div id="down_bg_2">
-	<div id="cap"><img src="../skin/images/cap_user_info.gif"></div><br><br><br>
+	<div id="cap"><img src="../skin/images/gj_edit.gif"></div><br><br><br>
 	<div id="right_table_center">
 		<table width="60%" style='margin:auto;' border=0 cellPadding=0 cellSpacing=0 bordercolor="#3491D6" borderColorDark="#ffffff">
 			<tr height='30'>
@@ -82,26 +96,71 @@
 							</td>
 						</tr>	
 						<tr height='30'>
+							<td width='20%' align='center'>尺寸(m)</td>
+							<td width='30%' align='left'>
+								<input type='text' name='Size' style='width:96%;height:20px;' value='<%=Size%>' maxlength='6'>
+							</td>
 							<td width='20%' align='center'>入管编号</td>
 							<td width='30%' align='left'>
-								<input type='text' name='In_Id' style='width:96%;height:20px;' value='<%=In_Id%>' maxlength='6'>
-							</td>
-							<td width='20%' align='center'>出管编号</td>
-							<td width='30%' align='left'>
-								<input type='text' name='Out_Id' style='width:96%;height:20px;' value='<%=Out_Id%>' maxlength='6'>
+								<input type='text' name='In_Id' style='width:96%;height:20px;' value='<%=In_Id%>' maxlength='27'>
 							</td>
 						</tr>
 						<tr height='30'>
+							<td width='20%' align='center'>起终点</td>
+							<td width='30%' align='left'>
+								<select name="Flag" style="width:97%;height:20px"> 
+								    <option value="0" <%=Flag.equals("0")?"selected":""%>>起点</option>
+								    <option value="1" <%=Flag.equals("1")?"selected":""%>>中间点</option>
+								    <option value="2" <%=Flag.equals("2")?"selected":""%>>终点</option>
+								    <option value="3" <%=Flag.equals("3")?"selected":""%>>主起点</option>
+								</select>
+							</td>
+							<td width='20%' align='center'>出管编号</td>
+							<td width='30%' align='left'  >
+								<input type='text' name='Out_Id' style='width:96%;height:20px;' value='<%=Out_Id%>' maxlength='27'>
+							</td>
+						</tr>		
+						<tr height='30'>
+							</td>
 							<td width='20%' align='center'>材料类型</td>
 							<td width='30%' align='left'  >
 								<input type='text' name='Material' style='width:96%;height:20px;' value='<%=Material%>' maxlength='11'>
 							</td>
+							<td width='20%' align='center'>数据等级</td>
+							<td width='30%' align='left'>
+								<select name="Data_Lev" style="width:97%;height:20px"> 
+								    <option value="1" <%=Data_Lev.equals("1")?"selected":""%>>人工插值</option>
+								    <option value="2" <%=Data_Lev.equals("2")?"selected":""%>>原始探测</option>
+								    <option value="3" <%=Data_Lev.equals("3")?"selected":""%>>竣工图数据</option>
+								    <option value="4" <%=Data_Lev.equals("4")?"selected":""%>>人工插值经过现场校验</option>
+								    <option value="5" <%=Data_Lev.equals("5")?"selected":""%>>原始探测经过二次校验</option>
+								    <option value="6" <%=Data_Lev.equals("6")?"selected":""%>>可疑数据</option>
+								</select>
+							</td>
+						</tr>
+						<tr height='30'>
 							<td width='20%' align='center'>设备名称</td>
 							<td width='30%' align='left'  >
 								<%=Equip_Name%>
 							</td>
-						</tr>		
-							
+							<td width='20%' align='center'>设备深度</td>
+							<td width='30%' align='left'  >
+								<%
+								if(!Equip_Name.equals(""))
+								{
+								%>
+									<input type='text' name='Equip_Height' style='width:96%;height:20px;' value='<%=Equip_Height%>' maxlength='11'>
+								<%
+								}
+								%>
+							</td>
+						</tr>
+						<tr height='30'>
+							<td width='20%' align='center'>设备号码</td>
+							<td width='30%' align='left'  >
+								<input type='text' name='Equip_Tel' style='width:96%;height:20px;' value='<%=Equip_Tel%>' maxlength='11'>
+							</td>
+						</tr>
 					</table>
 				</td>
 			</tr>
@@ -121,12 +180,17 @@ function doEdit()
 {
   if(confirm("信息无误,确定编辑?"))
   {
-  	location = "Admin_DevGJ_Info.do?Cmd=11&Id=<%=Id%>&Sid=<%=Sid%>&Top_Height="
-  	         + Dev_GJ_Edit.Top_Height.value
-  	         + "&Base_Height=" + Dev_GJ_Edit.Base_Height.value
-  	         + "&In_Id=" + Dev_GJ_Edit.In_Id.value
-  	         + "&Out_Id=" + Dev_GJ_Edit.Out_Id.value
-  	         + "&Material=" + Dev_GJ_Edit.Material.value
+  	location = "Admin_DevGJ_Info.do?Func_Project_Id=<%=Project_Id%>&Cmd=11&Id=<%=Id%>&Sid=<%=Sid%>&Top_Height="
+  	         + Admin_DevGJ_InfoEdit.Top_Height.value
+  	         + "&Base_Height=" + Admin_DevGJ_InfoEdit.Base_Height.value
+  	         + "&Size=" + Admin_DevGJ_InfoEdit.Size.value
+  	         + "&In_Id=" + Admin_DevGJ_InfoEdit.In_Id.value
+  	         + "&Out_Id=" + Admin_DevGJ_InfoEdit.Out_Id.value
+  	         + "&Flag=" + Admin_DevGJ_InfoEdit.Flag.value
+  	         + "&Material=" + Admin_DevGJ_InfoEdit.Material.value
+  	         + "&Data_Lev=" + Admin_DevGJ_InfoEdit.Data_Lev.value	
+  	         + "&Equip_Height=" + Admin_DevGJ_InfoEdit.Equip_Height.value
+  	         + "&Equip_Tel=" + Admin_DevGJ_InfoEdit.Equip_Tel.value         
   }
 }
 

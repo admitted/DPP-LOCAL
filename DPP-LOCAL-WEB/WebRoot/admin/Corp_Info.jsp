@@ -14,8 +14,8 @@
 </head>
 <%
 		
-	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
-  CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+	String Sid             = CommUtil.StrToGB2312(request.getParameter("Sid"));
+  CurrStatus currStatus  = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
 	CorpInfoBean Corp_Info = (CorpInfoBean)session.getAttribute("Corp_Info_" + Sid);
 	String Cmd = "10";
 	String Id = "";
@@ -51,7 +51,7 @@
 	
 %>
 <body  style=" background:#CADFFF">
-<form name="CorpInfo_Edit" action="Corp_Info.do" method="post" target="mFrame">
+<form name="CorpInfo_Edit" action="Admin_Corp_Info.do" method="post" target="mFrame">
 <div id="down_bg_2">
   <div id="cap"><img src="../skin/images/corp_info.gif"></div><br><br>
   <div id="right_table_center">
@@ -79,7 +79,7 @@
 		  	<td width="15%" align="center">µç&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;»°</td>
 		  	<td width="30%" align="left"><input name="Tel" type="text" maxlength="15" style="width:97%;height:20px" value="<%=Tel%>"></td> 		
 		  	<td width="15%" align="center">µØ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ö·</td>
-		  	<td width="80%" align="left" colspan=3><input name="Addr" type="text" maxlength="128" style="width:99%;height:20px" value="<%=Addr%>"></td>
+		  	<td width="30%" align="left"><input name="Addr" type="text" maxlength="128" style="width:97%;height:20px" value="<%=Addr%>"></td>
 		  
 	    </tr>	 	
 		  <tr height="30">
@@ -91,7 +91,7 @@
       	<td width="80%" align="left" colspan=3 valign="top">
 					<iframe id="msgType___Frame" src="../fckeditor/editor/fckeditor.html?InstanceName=Demo&amp;Toolbar=demoBasic" width="100%" height="400" frameborder="no" scrolling="no" style="border:0pt none;margin:0pt;padding:0pt;background-color:transparent;background-image:none;width:100%;height:400px;">
 					</iframe>
-					<input type="hidden" id="Demo" name="Demo" value="<%=Demo%>" >
+					<input type="hidden" id="Demo" name="Demo" value='<%=Demo%>' />
 		    </td>
 			</tr>
 				  
@@ -101,6 +101,9 @@
 <input type="hidden" name="Cmd" value="<%=Cmd%>">
 <input type="hidden" name="Sid" value="<%=Sid%>">
 </form>
+
+
+<a href="#" onClick="doGX_Suggest()">.</a>
 </body>
 <SCRIPT LANGUAGE=javascript>	
 if(<%=currStatus.getResult().length()%> > 0)
@@ -109,6 +112,12 @@ if(<%=currStatus.getResult().length()%> > 0)
 currStatus.setResult("");
 session.setAttribute("CurrStatus_" + Sid, currStatus);
 %>
+
+function doGX_Suggest()
+{
+	window.parent.frames.mFrame.location = 'Dev_GX_Suggest.jsp?Cmd=0&Sid=<%=Sid%>';
+}
+	
 
 function doEdit()
 { 

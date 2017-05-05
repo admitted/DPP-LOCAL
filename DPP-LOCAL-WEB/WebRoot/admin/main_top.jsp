@@ -29,11 +29,12 @@
 			<div id="banner_r" class="js">								
 			</div>
 		</div>
+		<a href="#" onClick="Openlayers()">.</a>
 	</div>
 </body>
 <SCRIPT LANGUAGE=javascript>
-//setInterval("time.innerHTML= new Date().toLocaleString()+' 星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);
-setInterval("time.innerHTML= new Date().toLocaleString().substring(0, new Date().toLocaleString().indexOf('日')+1)",1000);
+setInterval("time.innerHTML= new Date().toLocaleString()+' 星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);
+//setInterval("time.innerHTML= new Date().toLocaleString().substring(0, new Date().toLocaleString().indexOf('日')+1)",1000);
 
 function doExit()
 {
@@ -47,6 +48,10 @@ function doExit()
 function doPwd()
 {
 	window.parent.frames.mFrame.location = "Pwd_Edit.jsp?Sid=<%=Sid%>";
+}
+function Openlayers()
+{
+	window.parent.frames.mFrame.location = 'Openlayers.jsp';
 }
 </SCRIPT>
 </html>

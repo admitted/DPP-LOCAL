@@ -15,15 +15,18 @@
 <%
 	
 	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
-	
+		
 %>
 </head>
 <body style="background:#0B80CC;">
 <div id="PARENT">
 	<ul id="nav">
-		<li>
-			<a href="#" onClick="doCorp_Info()"                                       >公司信息</a>
-		</li>			
+		<li id="li03" class="panel-body"  ><a href="#" onClick="DoMenu('UserMenu1')">公司信息</a></li>	 
+		<ul id="UserMenu1" class="collapsed">	
+			<li id="Display0101"><a href="#" onClick="doCorp_Info()">公司配置</a></li>
+			<li id="Display0102"><a href="#" onClick="doAdmin_User_Role()">功能权限</a></li>
+			<li id="Display0103"><a href="#" onClick="doAdmin_Project_Role()">管理权限</a></li>
+ 	 	</ul>			
 		<li>
 			<a href="#" onClick="doUser_Info()"                                       >用户管理</a>
 		</li>		
@@ -31,16 +34,23 @@
 			<a href="#" onClick="doProject_Info()"                                    >项目管理</a>
 		</li>	
 		<li>
-			<a href="#" onClick="doGJ_Load()"                                         >管线录入</a>
-		</li>	
-		<li id="li04" class="panel-body"  ><a href="#" onClick="DoMenu('UserMenu2')">管线管理</a></li>	 
-		<ul id="UserMenu2" class="collapsed">	
-			<li id="Display0201"><a href="#" onClick="doGIS_GJ()" 	   >管线地图</a></li>
-			<li id="Display0202"><a href="#" onClick="doGJ_Info()"	   >管井列表</a></li>
-			<li id="Display0203"><a href="#" onClick="doGX_Info()"  	 >管线列表</a></li>
-			<li id="Display0204"><a href="#" onClick="doEquip_Info()"  >设备管理</a></li>
+		
+		<!--
+		<li id="li03" class="panel-body"  ><a href="#" onClick="DoMenu('UserMenu3')">管线导入</a></li>	 
+		<ul id="UserMenu3" class="collapsed">	
+			<li id="Display0301"><a href="#" onClick="doImport_Excel()">导 入</a></li>
+			<li id="Display0302"><a href="#" onClick="doUpdata_Excel()">更 新</a></li>
+ 	 	</ul>			
+		-->
+		
+		<li id="li04" class="panel-body"  ><a href="#" onClick="DoMenu('UserMenu4')">管线管理</a></li>
+		<ul id="UserMenu4" class="collapsed">	
+			<li id="Display0401"><a href="#" onClick="doGIS_GJ()" 	   >管线地图</a></li>
+			<li id="Display0402"><a href="#" onClick="doGJ_Info()"	   >管井列表</a></li>
+			<li id="Display0403"><a href="#" onClick="doGX_Info()"  	 >管线列表</a></li>
+			<li id="Display0404"><a href="#" onClick="doEquip_Info()"  >设备管理</a></li>
  	 	</ul>
-	  </li>
+ 	 	
 	  <!--
 	 <li><a href="#" onClick="doDiaphic()"    >图表分析</a></li>	-->
 	</ul>
@@ -74,10 +84,20 @@ function doCorp_Info()
 {
 	window.parent.frames.mFrame.location = 'Admin_Corp_Info.do?Cmd=0&Sid=<%=Sid%>';
 }
+//--------------------功能权限----------------------
+function doAdmin_User_Role()
+{
+	window.parent.frames.mFrame.location = 'Admin_User_Role.do?Cmd=0&Sid=<%=Sid%>';
+}
+//--------------------管理权限----------------------
+function doAdmin_Project_Role()
+{
+	window.parent.frames.mFrame.location = 'Admin_User_Role.do?Cmd=1&Sid=<%=Sid%>';
+}
 //-------------------用户管理-----------------------
 function doUser_Info()
 {	
-	window.parent.frames.mFrame.location = 'Admin_User_Info.do?Cmd=1&Func_Corp_Id=99&Sid=<%=Sid%>';
+	window.parent.frames.mFrame.location = 'Admin_User_Info.do?Cmd=1&Sid=<%=Sid%>';
 }
 //-------------------项目管理-----------------------
 function doProject_Info()
@@ -91,24 +111,33 @@ function doGIS_GJ()
 }
 function doGJ_Info()
 {
-	window.parent.frames.mFrame.location = 'Admin_DevGJ_Info.do?Cmd=0&Sid=<%=Sid%>';
+	window.parent.frames.mFrame.location = 'Admin_DevGJ_Info.do?Cmd=0&Sid=<%=Sid%>&Func_Project_Id=000001';
 }
 function doGX_Info()
 {
-	window.parent.frames.mFrame.location = 'Admin_DevGX_Info.do?Cmd=0&Sid=<%=Sid%>';
+	window.parent.frames.mFrame.location = 'Admin_DevGX_Info.do?Cmd=0&Sid=<%=Sid%>&Func_Project_Id=000001';
 }
 function doGJ_Load()
 {	
-	window.parent.frames.mFrame.location = 'GJ_Excel.jsp?Sid=<%=Sid%>';
+	window.parent.frames.mFrame.location = 'GJ_Load.jsp?Sid=<%=Sid%>';
+}
+function doImport_Excel()
+{	
+	window.parent.frames.mFrame.location = 'Import_Excel.jsp?Sid=<%=Sid%>&Project_Id=000001';
+}
+//更新
+function doUpdata_Excel()
+{	
+	window.parent.frames.mFrame.location = 'Update_Excel.jsp?Sid=<%=Sid%>&Project_Id=000001';
 }
 function doEquip_Info()
 {	
-	window.parent.frames.mFrame.location = 'Admin_Equipment_Info.do?Sid=<%=Sid%>';
+	window.parent.frames.mFrame.location = 'Admin_Equip_Info.do?Sid=<%=Sid%>';
 }
 
 function doDiaphic()
 {	
-	window.parent.frames.mFrame.location = "Diapgic.do?Sid=<%=Sid%>&Cmd=4&Start_Id=HCBWJ002&End_Id=HCBWJ003&Id=HCBWG003";
+	window.parent.frames.mFrame.location = "Diapgic.do?Sid=<%=Sid%>&Cmd=4&Subsys_Id=001";
 }
 </SCRIPT>
 </html>

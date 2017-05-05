@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=gb2312" %>
+<%@ page contentType="text/html; charset=gbk" %>
 <%@ page import="java.util.*" %>
 <%@ page import="bean.*" %>
 <%@ page import="rmi.*" %>
@@ -7,8 +7,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>百事达排水管网信息管理平台</title>
-<link rel="icon" type="image/png" href="skin/images/logo_32.png">
+<title>城基排水管网信息管理平台</title>
+<link rel="icon" type="image/png" href="skin/images/logo_58.png">
 <link rel="apple-touch-icon" href="skin/images/logo_57.png" />
 <link href="skin/css/index.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="skin/js/one.js"></script>
@@ -56,25 +56,26 @@
 <form  name="login" action="Login.do"  method="post" target="_self">
 <div class="center">
 <div class="top1">
-	<div><img src="skin/images/logoV2.0.jpg" /></div>
+	<div><img src="skin/images/logoV2.jpg" /></div>
 	<div class="top3">
 		<div class="fontsz">
 	  	<table width="231" border="0">
 	    	<tr>
 	      	<td width="82"><label></label></td>
-	      	<td width="139">&nbsp;</td>
+	      	<td width="139" colspan=2 >&nbsp;</td>
 	    	</tr>
 	    	<tr>
 	      	<td>用  户 名： </td>
-	      	<td><input  id="Id" name="Id" maxlength="20" style="background-color:transparent" type="text" id="textfield2" size="14"  value="<%=Cook_Emp_Id%>" /></td>
+	      	<td colspan=2 ><input  id="Id" name="Id" maxlength="20" style="background-color:transparent" type="text" id="textfield2" size="14"  value="<%=Cook_Emp_Id%>" /></td>
 	    	</tr>
 	    	<tr>
 	      	<td>密 　  码：</td>
-	      	<td><input name="Pwd" maxlength="6" style="background-color:transparent" type="password" id="textfield3" size="14" /></td>
+	      	<td colspan=2 ><input name="Pwd" maxlength="6" style="background-color:transparent" type="password" id="textfield3" size="14" /></td>
 	   	 	</tr>
 	    	<tr>
 		      <td>验  证 码：</td>
-		      <td><input name="Check_Code" maxlength="6" type="text" id="textfield4" maxlength="6" style="background-color:transparent;margin-bottom:5px;margin-top:0px;" size="6" runat="server" onkeydown="fnTrapKD('Image4')"/>&nbsp&nbsp&nbsp<img style="padding-top:4px;" border=0 src="index.do?Sid=<%=Sid%>"></td>
+		      <td width="66"><input name="Check_Code" maxlength="4" type="text" id="textfield4"  style="background-color:transparent;margin-bottom:0px;margin-top:0px;vertical-align:middle;" size="4" runat="server" onkeydown="fnTrapKD('Image4')"/></td>
+		      <td align=left vertical-align=middle> <img src="index.do?Sid=<%=Sid%>"></td>
 		    </tr>
 		  </table>
 		</div>
@@ -83,11 +84,9 @@
 				<a href="#" onClick="" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image5','','skin/images/c1_down.gif',1)"><img onClick="PwdEdit()" src="skin/images/c1_over.gif" name="Image5" width="97" height="28" border="0" id="Image5" /></a>
 		</div>
 		<div class="fontsz3" style='text-align:left;margin-left:200px'>
-			公司:杭州百事达计算机科技有限公司
-			&nbsp;&nbsp;&nbsp;&nbsp;
-			电话:0571-85357888
+			公司:杭州城基管道科技有限公司&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;电话:0571-86950039
 		  <br>
-		  地址:杭州市下城区潮王路45号东方豪园文豪阁906室
+		  地址:浙江省杭州市拱墅区萍水街333号御峰大厦827
 		</div>
 	</div>
 	<div><img src="skin/images/t4.gif" /></div>

@@ -13,14 +13,14 @@
 <script language=javascript>document.oncontextmenu=function(){window.event.returnValue=false;};</script>
 </head>
 <%
-	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
-	CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+	String Sid                  = CommUtil.StrToGB2312(request.getParameter("Sid"));
+	CurrStatus currStatus       = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
   ArrayList    Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
 %>
 <body style="background:#CADFFF">
 <form name="Project_Info_Add"  action="Admin_Project_Info.do" method="post" target="mFrame">
 <div id="down_bg_2">
-	<div id="cap"><img src="../skin/images/cap_user_info.gif"></div><br><br><br>
+	<div id="cap"><img src="../skin/images/project_info.gif"></div><br><br><br>
 	<div id="right_table_center">
 		<table width="60%" style='margin:auto;' border=0 cellPadding=0 cellSpacing=0 bordercolor="#3491D6" borderColorDark="#ffffff">
 			<tr height='30'>
@@ -44,7 +44,7 @@
 							</td>
 							<td width='20%' align='center'>项目名称</td>
 							<td width='30%' align='left'>
-									<input type='text' name='CName' style='width:96%;height:20px;' value='' maxlength='6'>							        
+									<input type='text' name='CName' style='width:96%;height:20px;' value='' maxlength='11'>							        
 							</td>
 						</tr>
 						
@@ -72,8 +72,9 @@
 						<tr height='30'>
 							<td width='20%' align='center'>项目描述</td>
 							<td width='30%' align='left'>
-								<input type='text' name='Demo' style='width:96%;height:20px;' value='' maxlength='11'>
+								<input type='text' name='Demo' style='width:96%;height:20px;' value='' maxlength='21'>
 							</td>
+							
 						</tr>		
 												
 					</table>
@@ -84,6 +85,7 @@
 </div>
 <input name="Cmd" type="hidden" value="10">
 <input name="Sid" type="hidden" value="<%=Sid%>">
+<input name="Coord" type="hidden" value="1">
 </form>
 </body>
 <SCRIPT LANGUAGE=javascript>
@@ -99,6 +101,7 @@ function doCheck(Id)
 	}
 	if(Id.Trim().length > 0 && Id.Trim().length < 2)
 	{
+		 document.getElementById("ErrorMsg").style.color="red";
 		 document.getElementById("ErrorMsg").innerText = " X 需2-20位!";
 		 Flag = 0;
 		 return;
@@ -114,7 +117,7 @@ function doCheck(Id)
   }		
 	//设置回调函数
 	req.onreadystatechange = callbackCheckName;
-	var url = "IdCheck.do?Id="+Id+"&Sid=<%=Sid%>";
+	var url = "Project_IdCheck.do?Id="+Id+"&Sid=<%=Sid%>";
 	req.open("post",url,true);
 	req.send(null);
 	return true;
@@ -128,12 +131,14 @@ function callbackCheckName()
 			var str = "";
 			if(resp != null && resp == '0000')
 			{
+				 document.getElementById("ErrorMsg").style.color="green";
 				 document.getElementById("ErrorMsg").innerText = " √ 可用!";
 				 Flag = 1;
 				 return;
 			}
 			else if(resp != null && resp == '3006')
 			{
+				 document.getElementById("ErrorMsg").style.color="red";
 				 document.getElementById("ErrorMsg").innerText = " X 已存在!";
 				 Flag = 0;
 				 return;

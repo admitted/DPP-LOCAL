@@ -14,10 +14,12 @@
 </head>
 <%
 	
-	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
-	CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-	CorpInfoBean Corp_Info = (CorpInfoBean)session.getAttribute("Corp_Info_" + Sid);
-	ArrayList    Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
+	String Sid              =  CommUtil.StrToGB2312(request.getParameter("Sid"));
+	CurrStatus currStatus   = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+	CorpInfoBean Corp_Info  = (CorpInfoBean)session.getAttribute("Corp_Info_" + Sid);
+	ArrayList  FP_Role      = (ArrayList)session.getAttribute("FP_Role_" + Sid);
+	ArrayList Manage_Role   = (ArrayList)session.getAttribute("Manage_Role_" + Sid);
+	ArrayList User_Info     = (ArrayList)session.getAttribute("User_Info_" + Sid);
   String Dept = "";
   if(Corp_Info != null)
 	{
@@ -28,17 +30,16 @@
     }
  	}
  	
- 	ArrayList FP_Role = (ArrayList)session.getAttribute("FP_Role_" + Sid);
-  ArrayList Manage_Role = (ArrayList)session.getAttribute("Manage_Role_" + Sid);
- 	ArrayList User_Info = (ArrayList)session.getAttribute("User_Info_" + Sid);
  	String Id = request.getParameter("Id");
   String CName = "";
   String Dept_Id = "";
 	String Birthday = "";
 	String Tel = "";
-	String Status = "";
+	String States = "";
 	String Project_Id = "";
 	String Pwd = "";
+	String User_Role_Id = "";
+	String User_Manage_Role = "";
 	
 	if(User_Info != null)
 	{
@@ -52,27 +53,26 @@
 					Dept_Id = statBean.getDept_Id();
 					Birthday = statBean.getBirthday();
 					Tel = statBean.getTel();
-					Status = statBean.getStatus();
+					States = statBean.getStatus();
 					Project_Id = statBean.getProject_Id();
 					Pwd = statBean.getPwd();
-					
+					User_Role_Id = statBean.getFp_Role();
+					User_Manage_Role = statBean.getManage_Role();
 			}
 		}
  	}
-	
-  
 %>
 <body style="background:#CADFFF">
-<form name="User_Info_Edit"  action="Admin_User_Info.do" method="post" target="mFrame" enctype="multipart/form-data">
+<form name="Admin_User_Info"  action="Admin_User_Info.do" method="post" target="mFrame" enctype="multipart/form-data">
 <div id="down_bg_2">
 	<div id="cap"><img src="../skin/images/cap_user_info.gif"></div><br><br><br>
 	<div id="right_table_center">
 		<table width="60%" style='margin:auto;' border=0 cellPadding=0 cellSpacing=0 bordercolor="#3491D6" borderColorDark="#ffffff">
 			<tr height='30'>
 				<td width='100%' align='right'>
-					<img src="../skin/images/mini_button_submit.gif"    style='cursor:hand;' onClick='doEdit()'>
-					<img src="../skin/images/mini_button_pwd_reset.gif" style='cursor:hand;' onClick='doPwdEdit()'>
-					<img src="../skin/images/button10.gif"              style='cursor:hand;' onclick='doNO()'>
+					<img src="../skin/images/mini_button_submit.gif"    style="cursor:hand;" onClick="doEdit()">
+					<img src="../skin/images/mini_button_pwd_reset.gif" style="cursor:hand;" onClick="doPwdEdit()">
+					<img src="../skin/images/button10.gif"              style="cursor:hand;" onclick="doNO()">
 				</td>
 			</tr>
 			<tr height='30'>
@@ -122,39 +122,67 @@
 							<td width='20%' align='center'>入职时间</td>
 							<td width='30%' align='left'>
 								<input type="text" name="Birthday" onClick="WdatePicker({readOnly:true})" class="Wdate" maxlength="10" style='width:97%;' value='<%=Birthday%>'>
-							</td>			
-							<td width='20%' align='center'>项&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;目</td>
-							<td width='30%' align='left'>
-
-								<select name="Project_Id" style="width:97%;height:20px"> 
-								<%
- 	                if(Project_Info != null){
-		  								Iterator iterator = Project_Info.iterator();
-											while(iterator.hasNext()){
-											ProjectInfoBean statBean = (ProjectInfoBean)iterator.next();
-											String Pro_Id = statBean.getId();
-											String Pro_Name = statBean.getCName();				
-								%>
-								    <option value="<%=Pro_Id%>" <%=Project_Id.equals(Pro_Id)?"selected":""%> > <%=Pro_Name%></option>
-								<%
-		    						 }
-									}
-								%>
-								</select>
-	
-							</td>
-						</tr>
-						<tr height='30'>	
+							</td>		
 							<td width='20%' align='center'>状&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;态</td>
 							<td width='30%' align='left'>
-								<select name='Status' style='width:97%;height:20px'>
-									<option value='0' <%=Status.equals("0")?"selected":""%>>启用</option>
-									<option value='1' <%=Status.equals("1")?"selected":""%>>注销</option>
+								<select name='States' style='width:97%;height:20px'>
+									<option value='0' <%=States.equals("0")?"selected":""%>>启用</option>
+									<option value='1' <%=States.equals("1")?"selected":""%>>注销</option>
 								</select>
+							</td>	
+							
+						</tr>
+						<tr height='30'>	
+							<td width='20%' align='center'>管理权限</td>							
+							<td width='30%' align='left' colspan=1>
+								<select id="Manage_Role" name='Manage_Role' style='width:97%;height:20px'>
+								<%
+								if(Manage_Role != null)
+								{
+									Iterator iterator = Manage_Role.iterator();
+									while(iterator.hasNext())
+									{
+										UserRoleBean statBean = (UserRoleBean)iterator.next();
+										if(statBean.getId().length() == 8)
+										{
+										String Role_Id = statBean.getId();
+										String Role_CName = statBean.getCName();
+								%>
+									<option value='<%=Role_Id%>' <%=User_Manage_Role.equals(Role_Id)?"selected":""%>><%=Role_CName%></option>
+								<%
+										}
+									}
+							 	}
+								%>	
+								</select>
+								<!--
+								<select id="Manage_Role1" name='Manage_Role1' onChange="doSelect2()" style='width:30%;height:20px'>
+								</select>
+								<select id="Manage_Role2" name='Manage_Role2' style='width:30%;height:20px'>
+								</select>	
+								-->
+							</td>
+							<td width='20%' align='center'>功能权限</td>							
+							<td width='30%' align='left'>
+								<select name='User_Fp_Role' style='width:97%;height:20px'>
+								<%
+								if(FP_Role != null)
+								{
+									Iterator iterator = FP_Role.iterator();
+									while(iterator.hasNext())
+									{
+										UserRoleBean statBean = (UserRoleBean)iterator.next();
+										String Role_Id = statBean.getId();
+										String Role_CName = statBean.getCName();
+								%>
+									<option value='<%=Role_Id%>' <%=User_Role_Id.equals(Role_Id)?"selected":""%>><%=Role_CName%></option>
+								<%
+									}
+							 	}
+								%>	
+								</select>				
 							</td>
 						</tr>
-						
-						
 					</table>
 				</td>
 			</tr>
@@ -163,6 +191,7 @@
 </div>
 <input name="Id" type="hidden" value="<%=Id%>">
 <input name="Sid" type="hidden" value="<%=Sid%>">
+<input name="Cmd" type="hidden" value="11">
 </form>
 </body>
 
@@ -174,45 +203,145 @@ if(<%=currStatus.getResult().length()%> > 0)
 currStatus.setResult("");
 session.setAttribute("CurrStatus_" + Sid, currStatus);
 %>
+/**
+//动态添加市
+function doSelect1()
+{
+	//先删除
+	var length = document.getElementById('Manage_Role1').length;
+	for(var i=0; i<length; i++)
+	{
+		document.getElementById('Manage_Role1').remove(0);
+	}
+	var length = document.getElementById('Manage_Role2').length;
+	for(var i=0; i<length; i++)
+	{
+		document.getElementById('Manage_Role2').remove(0);
+	}
+	//再添加
+	var html = "<option value='' >全部</option>";
+	var Manage_Role = document.getElementById('Manage_Role').value;
+	<%
+	if(Manage_Role != null)
+	{
+		Iterator iterator = Manage_Role.iterator();
+		while(iterator.hasNext())
+		{
+			UserRoleBean statBean = (UserRoleBean)iterator.next();
+			if(statBean.getId().length() == 6)
+			{
+			String Role_Id = statBean.getId();
+			String Role_CName = statBean.getCName();
+	%>
+			if('<%=Role_Id%>'.indexOf(Manage_Role) >= 0)
+			{
+				html += "<option value='<%=Role_Id%>' <%=User_Manage_Role.equals(Role_Id.substring(0,4))?"selected":""%>><%=Role_CName%></option>";
+			}
+	<%
+			}
+		}
+	}
+	%>
+	document.getElementById('Manage_Role1').innerHTML = html;
+}
 
-
+//动态添加区域
+function doSelect2()
+{
+	//先删除
+	var length = document.getElementById('Manage_Role2').length;
+	for(var i=0; i<length; i++)
+	{
+		document.getElementById('Manage_Role2').remove(0);
+	}
+	//再添加
+	var html = "<option value='' >全部</option>";
+	var Manage_Role = document.getElementById('Manage_Role1').value;
+	<%
+	if(Manage_Role != null)
+	{
+		Iterator iterator = Manage_Role.iterator();
+		while(iterator.hasNext())
+		{
+			UserRoleBean statBean = (UserRoleBean)iterator.next();
+			if(statBean.getId().length() == 8)
+			{
+			String Role_Id = statBean.getId();
+			String Role_CName = statBean.getCName();
+	%>
+			if('<%=Role_Id%>'.indexOf(Manage_Role) >= 0)
+			{
+				html += "<option value='<%=Role_Id%>' <%=User_Manage_Role.equals(Role_Id.substring(0,6))?"selected":""%>><%=Role_CName%></option>";
+			}
+	<%
+			}
+		}
+	}
+	%>
+	document.getElementById('Manage_Role2').innerHTML = html;
+}**/
 
 function doEdit()
 {
-  if(User_Info_Edit.Dept_Id.value.Trim().length < 1)
+  if(Admin_User_Info.Dept_Id.value.Trim().length < 1)
   {
     alert("请选择部门!");
     return;
   }
 
-  if(User_Info_Edit.CName.value.Trim().length < 1)
+  if(Admin_User_Info.CName.value.Trim().length < 1)
   {
     alert("请输入姓名!");
     return;
   }
 
-  if(User_Info_Edit.Tel.value.Trim().length < 1)
+  if(Admin_User_Info.Tel.value.Trim().length < 1)
   {
     alert("请输入联系电话!");
     return;
   }
 
-  if(User_Info_Edit.Birthday.value.Trim().length < 1)
+  if(Admin_User_Info.Birthday.value.Trim().length < 1)
   {
     alert("请输入入职时间!");
     return;
   }
 
-
+	var Manage_Role = "";
+	if(Admin_User_Info.Manage_Role.value.Trim().length < 1)
+	{
+		alert("请选择管理权限时间!");
+    return;	
+	}
+	/**
+	else
+	{
+		if(Admin_User_Info.Manage_Role1.value.Trim().length > 1)
+		{
+			if(Admin_User_Info.Manage_Role2.value.Trim().length > 1)
+			{
+				Manage_Role = Admin_User_Info.Manage_Role2.value;
+			}else
+			{
+				Manage_Role = Admin_User_Info.Manage_Role1.value;
+			}
+		}else
+		{
+			Manage_Role = Admin_User_Info.Manage_Role.value;
+		}
+	}
+	*/
+	
   if(confirm("信息无误,确定编辑?"))
   {
-  	location = "User_Info.do?Cmd=11&Id=<%=Id%>&Sid=<%=Sid%>&Func_Corp_Id=<%=currStatus.getFunc_Corp_Id()%>&Dept_Id="
-  	         + User_Info_Edit.Dept_Id.value
-  	         + "&CName=" + User_Info_Edit.CName.value
-  	         + "&Tel=" + User_Info_Edit.Tel.value
-  	         + "&Birthday=" + User_Info_Edit.Birthday.value
-  	         + "&Project_Id=" + User_Info_Edit.Project_Id.value
-  	         + "&Status=" + User_Info_Edit.Status.value;
+  	location = "Admin_User_Info.do?Cmd=11&Id=<%=Id%>&Sid=<%=Sid%>"
+  	         + "&Dept_Id=" + Admin_User_Info.Dept_Id.value
+  	         + "&CName=" + Admin_User_Info.CName.value
+  	         + "&Tel=" + Admin_User_Info.Tel.value
+  	         + "&Birthday=" + Admin_User_Info.Birthday.value
+  	         + "&Manage_Role=" + Admin_User_Info.Manage_Role.value
+  	         + "&Fp_Role=" + Admin_User_Info.User_Fp_Role.value
+  	         + "&Status=" + Admin_User_Info.States.value;
   }
 }
 
@@ -220,11 +349,13 @@ function doPwdEdit()
 {
 	if(confirm("确认将密码重置为111111?"))
 	{
-		m_PwdEdit = createXHR();
+		m_PwdEdit = new XMLHttpRequest();
 		if(m_PwdEdit)
 		{
 			m_PwdEdit.onreadystatechange = callbackForPwdEdit;
-			var url = "PwdEdit.do?Cmd=24&Sid=<%=Sid%>&Id=<%=Id%>&Pwd=<%=Pwd%>&NewPwd=111111&Func_Corp_Id=<%=currStatus.getFunc_Corp_Id()%>&currtime="+new Date();
+			var url = "PwdEdit.do?Cmd=24&Sid=<%=Sid%>&Id=<%=Id%>"
+			+"&Pwd=<%=Pwd%>&NewPwd=111111"
+			+"&currtime="+new Date();
 			m_PwdEdit.open("get", url);
 			m_PwdEdit.send(null);
 		}

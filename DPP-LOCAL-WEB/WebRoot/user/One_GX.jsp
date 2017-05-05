@@ -18,48 +18,39 @@
 <%
 	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));			
   CurrStatus currStatus    = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-  ArrayList  One_GX        = (ArrayList)session.getAttribute("One_GX_" + Sid); 
+  DevGXBean  One_GX        = (DevGXBean)session.getAttribute("One_GX_" + Sid); 
   
+  String TId 				= One_GX.getId();
+  String Diameter 	= One_GX.getDiameter();
+  String Length 		= One_GX.getLength();
+	String Material		= One_GX.getMaterial();
+  String Curr_Data	= One_GX.getCurr_Data();
 %>
 <body style=" background:#CADFFF">
 <form name="Dev_GX"  action="doGx_Select.do" method="post" target="mFrame">
 <div>
-				<table width="100%" border=1 cellPadding=0 cellSpacing=0 bordercolor="#3491D6" borderColorDark="#ffffff">
-					
-		    <%
-					if(null != One_GX)
-					{
-						Iterator deviter = One_GX.iterator();
-						while(deviter.hasNext())
-						{
-							DevGXBean dBean = (DevGXBean)deviter.next();
-				%>   		    	
-					<tr  height='20'>
-							<td width="35px" align='center' >编码</td>
-							<td><%= dBean.getId()%>&nbsp; </td>
-					</tr>
-					<tr height='20'>
-							<td width="35px" align='center' >直径</td>
-							<td><%= dBean.getDiameter()%>&nbsp;</td>
-					</tr>
-					<tr height='20'>
-							<td width="35px" align='center' >长度</td>
-							<td><%= dBean.getLength()%> &nbsp; </td>
-					</tr>					
-					<tr height='20'>
-							<td  width="35px" align='center'>材料</td>
-							<td><%= dBean.getMaterial()%> &nbsp; </td>
-					</tr>
-					<tr height='20'>
-							<td width="35px" align='center' >流量</td>
-							<td>0</td>
-					</tr>						
-				<%
-						}
-					}
-		    %>
-				
-			</table>		
+	<table width="100%" border=1 cellPadding=0 cellSpacing=0 bordercolor="#3491D6" borderColorDark="#ffffff">	    	
+		<tr  height='25'>
+				<td width="35px" align='center' >编码</td>
+				<td>&nbsp;<%=TId%>&nbsp; </td>
+		</tr>
+		<tr height='25'>
+				<td width="35px" align='center' >直径</td>
+				<td>&nbsp;<%=Diameter%>&nbsp;</td>
+		</tr>
+		<tr height='25'>
+				<td width="35px" align='center' >长度</td>
+				<td>&nbsp;<%=Length%> &nbsp; </td>
+		</tr>					
+		<tr height='25'>
+				<td  width="35px" align='center'>材料</td>
+				<td>&nbsp;<%=Material%> &nbsp; </td>
+		</tr>
+		<tr height='25'>
+				<td width="35px" align='center' >流量</td>
+				<td>&nbsp;<%=Curr_Data%></td>
+		</tr>
+</table>		
 </div>
 </form>
 </body>

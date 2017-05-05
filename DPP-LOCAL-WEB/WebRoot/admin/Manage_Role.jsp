@@ -24,7 +24,7 @@
 	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
   CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
   ArrayList Manage_Role = (ArrayList)session.getAttribute("Manage_Role_" + Sid);
-  ArrayList Device_Detail   = (ArrayList)session.getAttribute("Device_Detail_" + Sid);
+  ArrayList Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
   
 %>
 <body style="background:#CADFFF">
@@ -146,43 +146,52 @@ function setRemoveBtn(treeId, treeNode)
 	switch(treeNode.level)
 	{
 		case 0:
-				return fabreak;
-			}
-			if(Point.trim().length() > 0)
-			{
-				String[] list = Point.split(",");
-				for(int i=0; i<list.length && list[i].trim().length() > 0; i++)
-				{
-					if(Device_Detail != null)
-					{
-						Iterator iterator2 = Device_Detail.iterator();
-						while(iterator2.hasNext())
-						{
-							EquipInfoBean Bean = (EquipInfoBean)iterator2.next();
-							if(Bean.getId().equals(list[i]))
-							{$('#' + treeNode.tId + 'Bean.getId()if (treeNode.eBean.getBrief()$('#addBtn_'+trBean.getId()ength>0) 
-		Ideturn;
-		var addStr = "<span class='button add' i}
-						}
-					}
-				}
-			}
-		}
-	}us='this.blur();'></span>";
+				return false;
+			break;
+		case 1:
+				return true;
+			break;
+		case 2:
+				return true;
+			break;
+		case 3:
+				return true;
+			break;
+		case 4:
+				return true;
+			break;
+		default:
+				return true;
+			break;
+	}
+}
+
+function addHoverDom(treeId, treeNode) 
+{
+	if(treeNode.tId.substring(0,7) == 'devTree')
+	{
+		return false;
+	}
+	if(0 == treeNode.level || 1 == treeNode.level || 2 == treeNode.level)
+	{	
+		var sObj = $('#' + treeNode.tId + '_span');
+		if (treeNode.editNameFlag || $('#addBtn_'+treeNode.id).length>0) 
+			return;
+		var addStr = "<span class='button add' id='addBtn_" + treeNode.id+ "' title='add node' onfocus='this.blur();'></span>";
 		sObj.after(addStr);
 		var btn = $('#addBtn_'+treeNode.id);
 		if (btn) btn.bind('click', function()
 		{
 			var zTree = $.fn.zTree.getZTreeObj('areaTree');
-			vif(Device_Detail != null)
-	{
-		Iterator iterator = Device_Detail.iterator();
-		while(iterator.hasNext())
-		{
-			EquipInfoBean statBean = (EquipInfoBean)iterator.next();
-			String Id = statBean.getId();
-			String Brief = statBean.getBrief();
-			if(null == Brief){Brief = "";}arseInt(childNodes[i].id, 10);
+			var newId = parseInt(treeNode.value + '00', 10);
+			var childNodes = zTree.transformToArray(treeNode);
+      for(var i=0; i<childNodes.length; i++)
+      {
+      	if(treeNode.value == childNodes[i].pId)
+      	{
+          if(parseInt(childNodes[i].id, 10) > newId)
+					{
+						newId = parseInt(childNodes[i].id, 10);
 					}
        	}
       }
@@ -414,16 +423,16 @@ var dataMaker = function(count)
 				String[] list = Point.split(",");
 				for(int i=0; i<list.length && list[i].trim().length() > 0; i++)
 				{
-					if(Device_Detail != null)
+					if(Project_Info != null)
 					{
-						Iterator iterator2 = Device_Detail.iterator();
+						Iterator iterator2 = Project_Info.iterator();
 						while(iterator2.hasNext())
 						{
-							DeviceDetailBean Bean = (DeviceDetailBean)iterator2.next();
+							ProjectInfoBean Bean = (ProjectInfoBean)iterator2.next();
 							if(Bean.getId().equals(list[i]))
 							{
 	%>
-								n = {id:'<%=Bean.getId()%>', name:'<%=Bean.getBrief()%>', value:'<%=Bean.getId()%>', pId:'<%=Id%>', open:false};
+								n = {id:'<%=Bean.getId()%>', name:'<%=Bean.getCName()%>', value:'<%=Bean.getId()%>', pId:'<%=Id%>', open:false};
 								nodes.push(n);    
 	<%
 							}
@@ -447,17 +456,17 @@ var dataMaker2 = function(count)
 	nodes.push(n);
 	
 	<%
-	if(Device_Detail != null)
+	if(Project_Info != null)
 	{
-		Iterator iterator = Device_Detail.iterator();
+		Iterator iterator = Project_Info.iterator();
 		while(iterator.hasNext())
 		{
-			DeviceDetailBean statBean = (DeviceDetailBean)iterator.next();
+			ProjectInfoBean statBean = (ProjectInfoBean)iterator.next();
 			String Id = statBean.getId();
-			String Brief = statBean.getBrief();
-			if(null == Brief){Brief = "";}
+			String CName = statBean.getCName();
+			if(null == CName){CName = "";}
 	%>
-			n = {id:'<%=Id%>', name:'<%=Brief%>',  value:'<%=Id%>', pId:'0', open:false};
+			n = {id:'<%=Id%>', name:'<%=CName%>',  value:'<%=Id%>', pId:'0', open:false};
 			nodes.push(n);
 	<%	
 		}
@@ -529,7 +538,7 @@ function doSubmit()
 		if(m_Add)
 		{
 			m_Add.onreadystatechange=callbackForAdd;
-			var url = 'User_RoleOP.do?Cmd=13&Sid=<%=Sid%>&Id=50&RoleList='+Control_Role+'&currtime='+new Date();
+			var url = 'Admin_Manage_RoleOP.do?Cmd=13&Sid=<%=Sid%>&Id=50&RoleList='+Control_Role+'&currtime='+new Date();
 			m_Add.open("post", url);
 			m_Add.send(null);
 		}

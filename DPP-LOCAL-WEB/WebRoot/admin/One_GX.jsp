@@ -16,9 +16,9 @@
 <script type='text/javascript' src='../skin/js/zDialog.js' charset='gb2312'></script>
 </head>
 <%
-	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));			
+	String Sid               = CommUtil.StrToGB2312(request.getParameter("Sid"));			
   CurrStatus currStatus    = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-  ArrayList  One_GX        = (ArrayList)session.getAttribute("One_GX_" + Sid); 
+  DevGXBean  One_GX        = (DevGXBean)session.getAttribute("One_GX_" + Sid); 
   
 %>
 <body style=" background:#CADFFF">
@@ -68,8 +68,4 @@
 </div>
 </form>
 </body>
-<SCRIPT LANGUAGE=javascript>
-
-
-</SCRIPT>
 </html>

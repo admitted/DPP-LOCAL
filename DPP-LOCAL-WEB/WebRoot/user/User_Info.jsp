@@ -17,6 +17,19 @@
 	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
 	UserInfoBean UserInfo = (UserInfoBean)session.getAttribute("UserInfo_" + Sid);
 	
+	String Id = "";
+	String Dept_Id = "";
+	String CName = "";
+	String Tel = "";
+	String Birthday = "";
+	if(null != UserInfo)
+	{
+		Id = UserInfo.getId();
+		Dept_Id = UserInfo.getDept_Id();
+		CName = UserInfo.getCName();
+		Tel = UserInfo.getTel();
+		Birthday = UserInfo.getBirthday();
+	}
 %>
 </head>
 <body style=" background:#CADFFF">
@@ -36,34 +49,27 @@
 						<tr height='30px'>
 					    <td width='20%' align='center' class='table_blue'>帐&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号</td>
 					    <td width='30%' align='left'>
-					      <%=UserInfo.getId()%>
+					    	<%=Id%>
 					    </td>
-					    <td width='20%' align='center' class='table_blue'>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+					    <td width='20%' align='center' class='table_blue'>部门&nbsp;&nbsp;ID</td>
 					    <td width='30%' align='left'>
-					      <input type='text' name='CName' style='width:95%;height:18px;' value='<%=UserInfo.getCName()%>' maxlength='6'>
+					      <%=Dept_Id%>
 					    </td>
 					  </tr>
 				  	<tr height='30px'>
+				  		<td width='20%' align='center' class='table_blue'>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+					    <td width='30%' align='left'>
+					      <input type='text' name='CName' style='width:95%;height:18px;' value='<%=CName%>' maxlength='6'>
+					    </td>
 					    <td width='20%' align='center' class='table_blue'>电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话</td>
 					    <td width='30%' align='left'>
-					      <input type='text' name='Tel' style='width:95%;height:18px;' value='<%=UserInfo.getTel()%>' maxlength='12'>
-					    </td>
-					    <td width='20%' align='center' class='table_blue'>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别</td>
-					    <td width='30%' align='left'>
-					      <select name='Sex' style='width:98%;height:20px'>
-						      <option value='0' <%=UserInfo.getSex().equals("0")?"selected":""%>>男</option>
-						      <option value='1' <%=UserInfo.getSex().equals("1")?"selected":""%>>女</option>
-					      </select>
+					      <input type='text' name='Tel' style='width:95%;height:18px;' value='<%=Tel%>' maxlength='12'>
 					    </td>
 					  </tr>
 				  	<tr height='30px'>
 					    <td width='20%' align='center' class='table_blue'>入职时间</td>
 					    <td width='30%' align='left'>
-					      <input type='text' name='Birthday' style='width:95%;' value='<%=UserInfo.getBirthday()%>' onClick='WdatePicker({readOnly:true})' class='Wdate' maxlength='10'>
-					    </td>
-					    <td width='20%' align='center' class='table_blue'>地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址</td>
-					    <td width='30%' align='left'>
-					      <input type='text' name='Addr' style='width:95%;height:18px;' value='<%=UserInfo.getAddr()%>' maxlength='64'>
+					      <input type='text' name='Birthday' style='width:95%;' value='<%=Birthday%>' onClick='WdatePicker({readOnly:true})' class='Wdate' maxlength='10'>
 					    </td>
 					  </tr>
 					</table>
@@ -94,19 +100,15 @@ function doSubmit()
 		alert('请填写入职时间');
 		return;
 	}
-	if(Info_Edit.Addr.value.Trim().length < 1)
-	{
-		alert('请填写详细地址');
-		return;
-	}
 	if(confirm("确认要修改您的个人信息?"))
 	{
 		xhr = createXHR();
 	  if(xhr)
 	  {
 	    xhr.onreadystatechange=callbackFunction;
-	    var url = "PwdEdit.do?Cmd=12&Sid=<%=Sid%>&Id=<%=UserInfo.getId()%>&CName="+Info_Edit.CName.value+"&Tel="+Info_Edit.Tel.value
-	            + "&Sex="+Info_Edit.Sex.value+"&Birthday="+Info_Edit.Birthday.value+"&Addr="+Info_Edit.Addr.value
+	    var url = "PwdEdit.do?Cmd=12&Sid=<%=Sid%>&Id=<%=Id%>"
+	            +"&CName="+Info_Edit.CName.value+"&Tel="+Info_Edit.Tel.value
+	            +"&Birthday="+Info_Edit.Birthday.value
 	            + "&currtime="+new Date();        
 	    xhr.open("get", url);
 	    xhr.send(null);

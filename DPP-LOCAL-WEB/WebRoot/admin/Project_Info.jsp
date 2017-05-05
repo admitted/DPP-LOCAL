@@ -12,8 +12,8 @@
 </head>
 <%
 	
-	String       Sid         = CommUtil.StrToGB2312(request.getParameter("Sid"));
-	CurrStatus   currStatus  = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+	String       Sid            = CommUtil.StrToGB2312(request.getParameter("Sid"));
+	CurrStatus   currStatus     = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
 	ArrayList    Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
 	 
   int sn = 0;
@@ -43,7 +43,7 @@
 							<td width="10%" class="table_deep_blue">经度</td>
 							<td width="10%" class="table_deep_blue">纬度</td>
 							<td width="10%" class="table_deep_blue">地图倍数</td>
-							<td width="10%" class="table_deep_blue">展示角度</td>
+							<td width="5%" class="table_deep_blue">展示角度</td>
 							<td width="10%" class="table_deep_blue">项目描述</td>
 						</tr>
 					<%
@@ -54,6 +54,10 @@
 							{
 								ProjectInfoBean statBean = (ProjectInfoBean)iterator.next();
 								String Id = statBean.getId();
+								if(Id.substring(0,1).equals("8"))
+								{
+									continue;
+								}
 								String CName = statBean.getCName();							
 								String Longitude = statBean.getLongitude();	
 								String Latitude	= statBean.getLatitude();	

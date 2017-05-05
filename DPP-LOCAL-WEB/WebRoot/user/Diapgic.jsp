@@ -11,6 +11,7 @@
 <script type="text/javascript" src="../skin/js/util.js"></script>
 <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
 <script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/highcharts-more.js"></script>
 <script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/exporting.js"></script>
 </head>
 <%
@@ -21,28 +22,26 @@
 	ArrayList    MoreDev_GX   = (ArrayList)session.getAttribute("MoreDev_GX_" + Sid);
 	ArrayList    MoreDev_GJ   = (ArrayList)session.getAttribute("MoreDev_GJ_" + Sid);
 	java.text.DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
-	String Dev_GX_Diameter = "";
-	String data1 = "";
-	String data2 = "";
-	String data3 = "";
-	String data4 = "";		
-	String data5 = "";	
-	String data6 = "";	
-	List<String> dList = new ArrayList<String>();
-	String data8 = "";
+
+	String Data_Line_a = "";
+	String Data_Line_b = "";
+	String Data_Line_c = "";
+	String Data_Line_d = "";
+	
+	String Data_Area_A = "";
+
+	String Data_Bar_A	= "";
+	String Data_Bar_B	= "";
+	String Data_Bar_C	= "";
+	String Data_Bar_D	= "";	
+	String Data_Bar_E	= "";
+	
 %>
 <body  style=" background:#CADFFF">
 <form name="Gj_File" action="File_GJ.do" method="post" target="mFrame" enctype="multipart/form-data">
 	<table width="100%" style='margin:auto;' border=0 cellPadding=0 cellSpacing=0 bordercolor="#3491D6" borderColorDark="#ffffff">
 		<tr height='100%' valign='middle'>
 			<td align=center>
-				<font color='red'><Strong>选择路线</Strong></font>
-				<select  name='Func_Name_Id' style='width:100px;height:21px'  >										
-						 <option value="999"   >花池北路1段</option>	
-						 <option value="999"   >花池北路2段</option>	
-						 <option value="999"   >花池东路1段</option>	
-						 <option value="999"   >花池东路2段</option>									 						
-				</select>
 			</td>
 		</tr>				
 	 </table> 
@@ -50,182 +49,187 @@
 </form>
 </body>
 <script LANGUAGE="javascript">
-$(function () {
-    $('#container').highcharts({
-
-        chart: {
-            type: 'column',
-            margin: [ 50, 50, 100, 80]
-        },
-
-        title: {
-            text: 'Water Elevation Profile: Node GJ123-134'
-        },
-
-        xAxis: {
-        	tickmarkPlacement:'on',
-        	title:	{
-        		text: 'Distance(m)'
-        		},
-             categories: [
-             //起点管井
-             'HCBWG001',
- <%
- 		if(null != MoreDev_GX)
- 		{
- 			 Iterator iterator = MoreDev_GX.iterator();
-			 while(iterator.hasNext())
-			  {
-						DevGXBean xBean = (DevGXBean)iterator.next();
-						Dev_GX_Diameter = xBean.getDiameter(); 
-						data8 = xBean.getLength()+"/"+xBean.getId();
-						if(!dList.contains(xBean.getStart_Id()))
-						{
-							dList.add(xBean.getStart_Id());
-							dList.add(xBean.getStart_Id());
-						}						
-	%>
-			'<%= data8%>',
-	<%					
-						
-			}
- 		} 
- 	
- %>             
-            ]
-            
-        },
-        
-<%	
+var xAx_Cat = new Array();
+var dataArea = new Array();
+<%
  		if(null != MoreDev_GJ)
  		{
- 			 Iterator iter = MoreDev_GJ.iterator();
-			 while(iter.hasNext())
-			  {
-					DevGJBean jBean = (DevGJBean)iter.next();
- 					if(null != MoreDev_GX)
- 					{
- 			 			Iterator it = MoreDev_GX.iterator();
-			 			while(it.hasNext())
-			 			 {
-								DevGXBean gxBean = (DevGXBean)it.next();
-								if(dList.contains(jBean.getId()))
-								{					
-									dList.remove(jBean.getId());
-									data1 += jBean.getBase_Height()+",";							
-									data2 += jBean.getWaterLev()+",";											
-									data3 += Float.parseFloat(gxBean.getDiameter())/1000+",";							
-									data4 += jBean.getTop_Height() +",";
-								if(!data2.equals("0"))
-								{
-									data5 += df.format(Float.parseFloat(jBean.getBase_Height())+Float.parseFloat(jBean.getWaterLev())+Float.parseFloat(gxBean.getDiameter())/1000+Float.parseFloat(jBean.getTop_Height()))+",";
-								}else
-									{
-										data5 += df.format(Float.parseFloat(jBean.getBase_Height())+Float.parseFloat(gxBean.getDiameter())+Float.parseFloat(jBean.getTop_Height()))+",";
-									}		
-										data6 += df.format(Float.parseFloat(jBean.getBase_Height())+Float.parseFloat(jBean.getWaterLev()))+",";	
-									}else
-										{
-										
-										}
-								}
- 		   				} 		
+			Iterator iter = MoreDev_GJ.iterator();
+			while(iter.hasNext())
+			{
+				DevGJBean gjBean = (DevGJBean)iter.next();
+				
+				String gjId = gjBean.getId();
+				String gjFlag = gjBean.getFlag();
+				String gjBase_Height = gjBean.getBase_Height();
+				String gjTop_Height = gjBean.getTop_Height();
+				String gjCurr_Data = gjBean.getCurr_Data();
+				
+				String gxBase_Height = "0";
+				String gxDiameter = "0";
+				String gxLength = "0";
+%>
+				xAx_Cat.push('<%=gjId%>');
+<%
+				if(null != MoreDev_GX)
+				{
+		 			Iterator it = MoreDev_GX.iterator();
+		 			while(it.hasNext())
+					{
+						DevGXBean gxBean = (DevGXBean)it.next();
+						String tmpGJId = "";
+						
+						if(gjFlag.equals("2"))	//终点管井
+						{
+							tmpGJId = gxBean.getEnd_Id();
 						}
- 					} 	
+						else
+						{
+							tmpGJId = gxBean.getStart_Id();
+						}							
+							
+						if(tmpGJId.contains(gjId))
+						{			
+							gxDiameter = gxBean.getDiameter();
+							gxLength = gxBean.getLength();
+							if(gjFlag.equals("2"))	//终点管井
+							{
+								gxBase_Height = gxBean.getEnd_Height();
+							}
+							else
+							{
+								gxBase_Height = gxBean.getStart_Height();
+							}							
+								
+							/**********数据b&数据c&数据d
+							Data_GX_Top 	+= df.format(Float.parseFloat(gxBaseHeight)+Float.parseFloat(gxBean.getDiameter()))+",";									
+							Data_WaterLev += df.format(Float.parseFloat(gjBaseHeight)+Float.parseFloat(gjBean.getCurr_Data()))+",";		
+							Data_GX_Base 	+= gxBaseHeight +",";
+							***********/
+						}
+	   			} 		
+				}
+				
+				Data_Line_a += gjTop_Height + ","; 
+				Data_Line_b += df.format(Float.parseFloat(gxBase_Height)+Float.parseFloat(gxDiameter))+",";	
+				Data_Line_c += df.format(Float.parseFloat(gjBase_Height)+Float.parseFloat(gjCurr_Data))+",";
+				Data_Line_d += gxBase_Height +",";
+				
+				Data_Bar_A += df.format(Float.parseFloat(gjTop_Height)-Float.parseFloat(gjCurr_Data)-Float.parseFloat(gjBase_Height))+",";
+				Data_Bar_C += gjCurr_Data+",";	
+				Data_Bar_E += gjBase_Height +",";
+				
+				Data_Area_A += "[" + gxBase_Height + ", " + df.format(Float.parseFloat(gjBase_Height)+Float.parseFloat(gjCurr_Data)) + "], ";
+				
+ 			}
+ 		} 	
  	%>
+$(function () {
+
+    $('#container').highcharts({
+        chart: {
+        },
+        credits: {
+            enabled: false
+        },
+        title: {
+            text: '管段剖面图'
+        },
+        xAxis: {
+            categories: xAx_Cat
+        },
         yAxis: {
-            allowDecimals: true,
             min: 0,
             title: {
-                text: 'Elevation(m)'
+                text: '海拔(m)'
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
             }
         },
-				legend: {
-            		enabled: false
-       			 },
+        legend: {
+            enabled: false
+        },
         tooltip: {
             formatter: function() {
-                return '<b>'+ this.x +'</b><br/>'+
-                    this.series.name +': '+ this.y +'<br/>';
+                return '<b>'+ this.x +'</b><br/>';
             }
-            
         },
-
         plotOptions: {
             column: {
-                stacking: 'normal',
-                pointPadding: 0,
+            		pointPadding: 0,
        					borderWidth: 0,
-        				pointWidth: 5,   
-        				dataLabels: {
-                  enabled: true},    				               
-            },  
-            line:
-            {
-            	dataLabels: {
-                  enabled: true},
-            	}     
-        },				
-        series: [
-        //柱状图 
-        {//实际显示图  
-        		type:'column',
-            name: '顶高',
-
-           	color:"#EED5B7",
-           	shadow: true,
-            data: [<%=data4%>],           
-            stack: 'male'
-        },               
-        
-        {//实际显示图  
-        		type:'column',
-            name: '管径',
-
-           	color:"#FFFFFF ",
-           	shadow: true,
-            data: [<%=data3%>],
-            stack: 'male'
-        }, 
-        {//掩盖图
-            name: '水位',
-            color:"red",
-            shadow: true,
-            data: [<%=data2%>],
-            stack: 'male'
+        				pointWidth: 20,
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: false
+                },                
+								tooltip:{
+									headerFormat:false
+								}
+            }
         },
-        {//掩盖图
-            name: '底高',
-            color:"green",
-            data: [<%=data1%>],
-            stack: 'male'
-        },
-        //线
-        {
+        series: [{
+        	  type: 'column',
+            name: '',
+            color: 'gray',
+            data: [<%=Data_Bar_A%>],
+        }, {
+        		type: 'column',
+            name: '',
+            color: 'blue',
+            data: [<%=Data_Bar_C%>],       
+        }, {
+        		type: 'column',
+            name: '',
+            color: 'blue',
+            data: [<%=Data_Bar_D%>],    
+        }, {
+        		type: 'column',
+            name: '',
+            color: 'white',
+            data: [<%=Data_Bar_E%>],     
+        }, {
           	type:'line',
-            name: '顶线',
+          	color:'black',
+            name: '',
             dashStyle: 'longdash',
-            data: [<%=data5%>]
-        },
-        {//显示区域
-          	type:'area',
-            name: '水高',
-
-            color:"#A6FFFF",
-            stack: 'tatl',
-            data: [<%=data6%>]
-        },
-        {//掩盖区域
-          	type:'area',
-            name: '底高',
-            colorByPoint:false,
-            color:"white",
-            stack: 'tatl',
-            data: [<%=data1%>]
-        }
-        ]                 
-    });  
+            data: [<%=Data_Line_a%>],
+            marker: {                                                     
+            	enabled:false
+            }
+        }, {
+          	type:'line',
+          	color:'black',
+            name: '',
+            dashStyle: 'Solid',
+            data: [<%=Data_Line_b%>],
+            marker: {                                                     
+            	enabled:false
+            } 
+        }, {
+            name: 'Range',
+            data: [<%=Data_Area_A%>],            
+            fillColor:'blue',
+            lineColor:'blue',
+            dashStyle:'DashDot',
+            lineWidth:1,
+            type: 'arearange'
+      	}, {
+          	type:'line',
+          	color:'black',
+            name: '',
+            dashStyle: 'Solid',
+            data: [<%=Data_Line_d%>],
+            marker: {                                                     
+            	enabled:false
+            }
+        }]
+    });
 });
-alert("<%=dList%>");
 </script>
 </html>

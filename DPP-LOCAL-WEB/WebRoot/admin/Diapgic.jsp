@@ -16,8 +16,8 @@
 <%
 	
 	String Sid = CommUtil.StrToGB2312(request.getParameter("Sid"));
-  CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-  ArrayList    Project_Info   = (ArrayList)session.getAttribute("Project_Info_" + Sid);
+  CurrStatus   currStatus   = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
+  ArrayList    Project_Info = (ArrayList)session.getAttribute("Project_Info_" + Sid);
 	ArrayList    MoreDev_GX   = (ArrayList)session.getAttribute("MoreDev_GX_" + Sid);
 	ArrayList    MoreDev_GJ   = (ArrayList)session.getAttribute("MoreDev_GJ_" + Sid);
 	String Dev_GX_Diameter = "";

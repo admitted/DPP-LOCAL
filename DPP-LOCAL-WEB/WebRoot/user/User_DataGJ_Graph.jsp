@@ -18,11 +18,11 @@
 <%
 	String Sid   = CommUtil.StrToGB2312(request.getParameter("Sid"));
   CurrStatus currStatus = (CurrStatus)session.getAttribute("CurrStatus_" + Sid);
-  UserInfoBean UserInfo = (UserInfoBean)session.getAttribute("UserInfo_" + Sid);
 	ArrayList User_DataGJ_Graph = (ArrayList)session.getAttribute("User_DataGJ_Graph_" + Sid);
 	ArrayList  One_GJ        = (ArrayList)session.getAttribute("One_GJ_" + Sid);
+	
   String GJ_Id = request.getParameter("GJ_Id");
-  String WaterLev = "";
+  String Curr_Data = "";
 	String Material = "";
 	String Base_Height = "";
 	String Top_Height = "";
@@ -30,8 +30,7 @@
   if(One_GJ != null){
   	Iterator iterator = One_GJ.iterator();
 		DevGJBean devGJBean = (DevGJBean)iterator.next();
-		GJ_Id = devGJBean.getId();
-	  WaterLev = devGJBean.getWaterLev();
+	  Curr_Data = devGJBean.getCurr_Data();
 		Material = devGJBean.getMaterial();
 		Base_Height = devGJBean.getBase_Height();
 		Top_Height = devGJBean.getTop_Height();
@@ -44,11 +43,11 @@
 
 	%>
 </head>
-<body style='background:#ffffff'>
+<body >
 <form name='User_DataGJ_Graph'   method='post' target='mFrame'>
-<div id='down_bg_2'>
+<div>
 	<table style='margin:auto'    border=0 cellPadding=0 cellSpacing=0 bordercolor='#3491D6' borderColorDark='#ffffff' width='100%'>
-			<tr height='30' valign='top'>
+			<tr height='30' valign='bottom'>
 					<td width='85%' align='center'>
 				      <select name='cmd' style='width:90px;height:20px' onChange='doSelect()'>
 				      	<option value='4' <%=(currStatus.getCmd() == 4 ?"SELECTED":"")%>>最近24小时</option>
@@ -68,7 +67,7 @@
 							顶高: <%=Top_Height%>&nbsp;
 							底高: <%=Base_Height%>&nbsp;
 							材质: <%=Material%>&nbsp;
-							水位: <%=WaterLev%>&nbsp;</td>
+							水位: <%=Curr_Data%>&nbsp;</td>
 					  </tr>				
   </table>
 </div>
@@ -76,11 +75,13 @@
 </form>
 </body>
 <SCRIPT LANGUAGE=javascript>
+	alert("<%=currStatus.getFunc_Project_Id()%>");
 function doSelect()
 {
-	location = "User_DataGJ_Graph.do?Sid=<%=Sid%>&Cmd="
-						+ User_DataGJ_Graph.cmd.value
-						+ "&GJ_Id=" + User_DataGJ_Graph.GJ_Id.value;
+	location = "User_DataGJ_Graph.do?Sid=<%=Sid%>"
+						+"&Cmd="User_DataGJ_Graph.cmd.value
+						+"&GJ_Id=" + User_DataGJ_Graph.GJ_Id.value
+						+"&Func_Project_Id=<%=currStatus.getFunc_Project_Id()%>";
 }	
 
 		var data_serie = [];
@@ -94,10 +95,15 @@ function doSelect()
 				 DataGJBean statBean = (DataGJBean)iterator.next();
 				 String CTime = statBean.getCTime();
 				 String CValue = statBean.getValue();
-			%>
-				 data_serie.push(parseFloat('<%=CValue%>'));
-				 data_xAxis.push('<%=CTime.substring(11,13)%>');
-			<%
+		%>
+		     if(4 == User_DataGJ_Graph.cmd.value){
+				 		data_serie.push(parseFloat('<%=CValue%>'));
+				 		data_xAxis.push('<%=CTime.substring(11,13)%>');
+				 }else{
+				 		data_serie.push(parseFloat('<%=CValue%>'));
+				 		data_xAxis.push('<%=CTime.substring(8,10)%>');
+				 }
+		<%
       }
   	}
 		%>
