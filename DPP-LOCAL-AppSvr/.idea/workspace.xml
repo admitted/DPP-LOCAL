@@ -146,26 +146,17 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TcpSvr.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TcpSvr.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/net/TcpSvr.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="93" column="33" selection-start-line="93" selection-start-column="33" selection-end-line="93" selection-end-column="33" />
+            <state relative-caret-position="380">
+              <caret line="109" column="18" selection-start-line="109" selection-start-column="18" selection-end-line="109" selection-end-column="18" />
               <folding>
+                <element signature="imports" expanded="true" />
                 <element signature="e#846#847#0" expanded="true" />
                 <element signature="e#883#884#0" expanded="true" />
-                <element signature="e#17801#17809#0" expanded="true" />
+                <element signature="e#18297#18305#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Socket.java" pinned="false" current-in-tab="true">
-        <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_101.jdk/Contents/Home/src.zip!/java/net/Socket.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="302">
-              <caret line="1129" column="54" selection-start-line="1129" selection-start-column="54" selection-end-line="1129" selection-end-column="54" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -930,12 +921,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1493989949581</updated>
-      <workItem from="1493989957602" duration="6941000" />
+      <workItem from="1493989957602" duration="7226000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6941000" />
+    <option name="totallyTimeSpent" value="7226000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -1309,23 +1300,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/net/TcpSvr.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="93" column="33" selection-start-line="93" selection-start-column="33" selection-end-line="93" selection-end-column="33" />
-          <folding>
-            <element signature="e#846#847#0" expanded="true" />
-            <element signature="e#883#884#0" expanded="true" />
-            <element signature="e#17801#17809#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_101.jdk/Contents/Home/src.zip!/java/net/Socket.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="302">
           <caret line="1129" column="54" selection-start-line="1129" selection-start-column="54" selection-end-line="1129" selection-end-column="54" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/net/TcpSvr.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="109" column="18" selection-start-line="109" selection-start-column="18" selection-end-line="109" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#846#847#0" expanded="true" />
+            <element signature="e#883#884#0" expanded="true" />
+            <element signature="e#18297#18305#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

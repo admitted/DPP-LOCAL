@@ -101,6 +101,14 @@ public class TcpSvr extends Thread {
                 CommUtil.PRINT("Send Original:");
                 CommUtil.printMsg(Buffer, RecvLen);
 
+                //Start..........................................
+                //Send Original:
+                //46 00 00 00   01 00 00 00   00 00 00 00   00 00 00 00   00 00 00 00
+                //30 30 30 30   30 30 30 30   30 30 30 30   30 30 20 20   20 20 20 20
+                //20 20 20 20   32 30 31 37   30 35 30 35   32 33 35 38   33 31 35 35
+                //38 32 31 35   42 34 34 30   35 33 39 42   32 38 35 44   41 37 30 39
+                //37 38 43 37   43 38 31 34   42 35
+
                 if (20 > RecvLen) {
                     objClient.close();
                     objClient = null;
