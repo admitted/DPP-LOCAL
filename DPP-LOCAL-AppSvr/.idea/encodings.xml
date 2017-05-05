@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/DPPLOCALAppSvr/Main.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/bean/AppDeviceDataReqBean.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/bean/BaseCmdBean.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/bean/DTURestartBean.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/bean/DTUUpdateTimeBean.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/container/ActionContainer.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/container/ClientContainer.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/container/ClientInfo.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/container/TimeCheckThrd.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/net/MsgCtrl.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/net/TcpClient.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/net/TcpSvr.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/CmdUtil.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/Cmd_Sta.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/CommUtil.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/ConnPool.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/CurrStatus.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/DBUtil.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/FileTool.java" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/util/MsgBean.java" charset="GB2312" />
+  </component>
+</project>

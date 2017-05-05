@@ -1,8 +1,8 @@
 package container;
 
-import java.util.Hashtable;
+import util.CommUtil;
 
-import util.*;
+import java.util.Hashtable;
 
 public class ClientContainer
 {	

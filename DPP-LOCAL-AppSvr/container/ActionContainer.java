@@ -1,21 +1,22 @@
 package container;
 
+import bean.BaseCmdBean;
+import util.CommUtil;
+
 import java.net.InetAddress;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import util.*;
-import bean.*;
 
 public class ActionContainer
 {
-	public static Hashtable<String, BaseCmdBean> objActionTable = null;//登陆客户端列表
+	public static Hashtable<String, BaseCmdBean> objActionTable = null;//?????????锟斤拷?
 	private static Byte markActionTable = new Byte((byte)1);	
 	
 	private static TimeCheckThrd checkThrd = null;
 
 	InetAddress addr = InetAddress.getLocalHost();
-	public String m_LocalIp = addr.getHostAddress().toString();//获得本机IP
+	public String m_LocalIp = addr.getHostAddress().toString();//??????IP
 	
 	public ActionContainer()throws Exception
 	{	  
@@ -40,7 +41,7 @@ public class ActionContainer
 	}
 	
 	/*
-	 * 获取
+	 * ???
 	 */
 	public static BaseCmdBean GetAction(String pKey)
 	{
@@ -52,7 +53,7 @@ public class ActionContainer
 				if(!objActionTable.isEmpty() && objActionTable.containsKey(pKey))
 				{
 					bean = (BaseCmdBean) objActionTable.get(pKey);
-					objActionTable.remove(pKey);		//在哈希表里移除
+					objActionTable.remove(pKey);		//???????????
 				}
 			}
 		}
@@ -64,7 +65,7 @@ public class ActionContainer
 	}
 	
 	/*
-	 * 增加
+	 * ????
 	 */
 	public static void InsertAction(String pKey, BaseCmdBean bean)
 	{
@@ -75,7 +76,7 @@ public class ActionContainer
 				if(objActionTable.containsKey(pKey))
 				{
 					CommUtil.PRINT("Key[" + pKey + "] Already Exist!");
-					objActionTable.remove(pKey);		//在哈希表里移除客户端
+					objActionTable.remove(pKey);		//????????????????
 				}		
 				objActionTable.put(pKey , bean);
 			}
@@ -86,7 +87,7 @@ public class ActionContainer
 		}
 	}
 	/*
-	 * 删除
+	 * ???
 	 */
 	public static void RemoveAction(String pKey)
 	{
@@ -96,7 +97,7 @@ public class ActionContainer
 			{
 				if(!objActionTable.isEmpty() && objActionTable.containsKey(pKey))
 				{
-						objActionTable.remove(pKey);		//在哈希表里移除客户端
+						objActionTable.remove(pKey);		//????????????????
 					
 				}
 			}
@@ -108,7 +109,7 @@ public class ActionContainer
 	}
 	public static LinkedList<String> GetTimeOutList(int mTimeOut)
 	{
-		LinkedList<String> checkList = new LinkedList<String>();		 //接收数据列表,用于客户端数据交换
+		LinkedList<String> checkList = new LinkedList<String>();		 //?????????锟斤拷?,???????????????
 	
 		try
 		{
@@ -136,7 +137,7 @@ public class ActionContainer
 				BaseCmdBean bean = GetAction(data);
 				if(null != bean)
 					bean.noticeTimeOut();
-				CommUtil.LOG(data + " 回应超时 111");
+				CommUtil.LOG(data + " ?????? 111");
 			}
 		}catch(Exception e)
 		{}		

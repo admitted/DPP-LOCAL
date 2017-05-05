@@ -1,20 +1,11 @@
 package util;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
+import org.apache.log4j.Logger;
+
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Vector;
-
-import org.apache.log4j.Logger;
 public class CommUtil
 {
 	private static boolean DEBUGFLAG = true;

@@ -1,12 +1,9 @@
 package bean;
 
 import net.MsgCtrl;
-import net.TcpSvr;
-import bean.BaseCmdBean;
 import util.CmdUtil;
 import util.Cmd_Sta;
 import util.CommUtil;
-import util.DBUtil;
 public class DTURestartBean extends BaseCmdBean {
 	
 	private String Dev_Id = "";			// DTUµÄID

@@ -1,12 +1,9 @@
 package bean;
 
 import net.MsgCtrl;
-import net.TcpSvr;
-import bean.BaseCmdBean;
 import util.CmdUtil;
 import util.Cmd_Sta;
 import util.CommUtil;
-import util.DBUtil;
 public class DTUUpdateTimeBean extends BaseCmdBean {	
 	private String BTime = "";			// 当前时间
 	

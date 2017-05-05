@@ -1,9 +1,9 @@
 package container;
 
-import java.util.LinkedList;
-
-import util.CommUtil;
 import bean.BaseCmdBean;
+import util.CommUtil;
+
+import java.util.LinkedList;
 
 
 /************************************·¢ËÍÏß³Ì*****************************************/
