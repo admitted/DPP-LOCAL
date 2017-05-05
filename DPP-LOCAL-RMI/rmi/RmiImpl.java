@@ -12,6 +12,7 @@ import util.*;
 
 import java.util.*;
 
+import net.TPCClient;
 import bean.*;
 import oracle.jdbc.OracleTypes;
 
@@ -31,6 +32,7 @@ public class RmiImpl extends UnicastRemoteObject implements Rmi
 	public final static long serialVersionUID = 1001;
 	
 	private DBUtil m_DBUtil = null;	
+	private TPCClient m_TPCClient = null;	
 	
 	/**空参构造器
 	 * @throws RemoteException
@@ -42,8 +44,9 @@ public class RmiImpl extends UnicastRemoteObject implements Rmi
 	/**初始化数据库连接池
 	 * @param pDbUtil
 	 */
-	public void Init(DBUtil pDbUtil) {
-		m_DBUtil = pDbUtil;
+	public void Init(DBUtil pDbUtil , TPCClient tPCClient ) {
+		m_DBUtil    = pDbUtil;
+		m_TPCClient = tPCClient;
 	}
 	
 
@@ -73,7 +76,7 @@ public class RmiImpl extends UnicastRemoteObject implements Rmi
 		{
 			case 0://查询
 				if(0 < CurrPage)  
-				{
+				{//每页个数限制
 					//总数: 需要分页显示时,才会去计算recordCount值  查询记录总数
 					recordCount = Integer.parseInt(doRecordCount("select count(*) as counts from (" + Sql + ")subselect"));
 					System.out.println("RecordCount["+recordCount+"]");
@@ -188,6 +191,9 @@ public class RmiImpl extends UnicastRemoteObject implements Rmi
 					case RmiBean.RMI_EQUIP_INFO:
 						rmiBean = new EquipInfoBean();
 						break;
+					case RmiBean.RMI_DATA_NOW:
+						rmiBean = new DataNowBean();
+						break;
 
 				/******************user*****************/
 					case RmiBean.RMI_DATA:
@@ -204,6 +210,9 @@ public class RmiImpl extends UnicastRemoteObject implements Rmi
 						break;
 					case RmiBean.RMI_DEVGX:
 						rmiBean = new DevGXBean();
+						break;
+					case RmiBean.RMI_MAP_IMAGE:
+						rmiBean = new MapImageBean();
 						break;
 						
 				}
@@ -487,5 +496,43 @@ public class RmiImpl extends UnicastRemoteObject implements Rmi
 			{ex.printStackTrace();}
 		}
 		return alist;
+	}
+	
+	public String Client(int pCmd, String pClient_Id, String pOprator)throws RemoteException
+	{
+		System.out.println("pCmd["+pCmd+"]\npClient_Id["+pClient_Id+"]");
+		String ret = "9999";
+		switch(pCmd)
+		{
+			case Cmd_Sta.CMD_RESTART:
+			{	
+				String SendData = CommUtil.StrBRightFillSpace(" ", 20)				//保留字
+								+ "0000"											//执行状态
+								+ "000" + Cmd_Sta.CMD_RESTART						//处理指令
+								+ CommUtil.StrBRightFillSpace(pClient_Id, 10)		//DTU编号
+								+ CommUtil.StrBRightFillSpace(pOprator, 10);		//操作人员
+				System.out.println("SendData["+SendData+"]");
+				if(m_TPCClient.SetSendMsg(SendData, 1))
+				{
+					ret = "0000";
+				}
+				break;
+			}
+			case Cmd_Sta.CMD_UPDATE_TIME:
+			{
+				String SendData = CommUtil.StrBRightFillSpace(" ", 20)
+								+ "0000"
+								+ "000" + Cmd_Sta.CMD_UPDATE_TIME
+								+ CommUtil.StrBRightFillSpace(pClient_Id, 10)
+								+ CommUtil.StrBRightFillSpace(pOprator, 10);
+				System.out.println("SendData["+SendData+"]");
+				if(m_TPCClient.SetSendMsg(SendData, 1))
+				{
+					ret = "0000";
+				}
+				break;
+			}
+		}	
+		return ret;
 	}
 }

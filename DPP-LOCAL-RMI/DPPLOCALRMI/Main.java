@@ -6,8 +6,11 @@ import java.io.InputStreamReader;
 import java.rmi.registry.LocateRegistry;
 import java.util.Hashtable;
 import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
+
+import net.TPCClient;
 import rmi.*;
 import util.*;
 
@@ -40,6 +43,13 @@ public class Main extends Thread {
 			LocateRegistry.createRegistry(RMIPORT);
 			m_RmiImpl = new RmiImpl();
 			ctx.rebind("DPPLOCAL", m_RmiImpl);
+			
+			//启动TPCClient
+			TPCClient pTPCClient = new TPCClient("Config.ini");
+			if(!pTPCClient.init())
+			{
+				System.out.println("RMI_TPCClient init failed!");
+			}
 				
 			//起点数据库
 			m_DBUtil = new DBUtil();
@@ -48,7 +58,7 @@ public class Main extends Thread {
 				System.out.println("m_DBUtil init failed!");
 			}
 			
-			m_RmiImpl.Init(m_DBUtil);	
+			m_RmiImpl.Init(m_DBUtil , pTPCClient);	
 			
 			this.start();
 			Runtime.getRuntime().addShutdownHook(new Thread() {

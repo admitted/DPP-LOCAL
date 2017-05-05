@@ -30,11 +30,14 @@ public abstract class RmiBean implements Serializable
 	
 	public static final int RMI_USER_POSITION			= 18;
 	public static final int RMI_CORP_INFO			    = 19;
+	public static final int RMI_DATA_NOW			    = 20;
 	
 	/**************************user-data*******************/
 	public static final int RMI_DATA			        = 30;
 	public static final int	RMI_DATAGJ					= 31;
 	public static final int	RMI_DATAGX					= 32;
+	public static final int	RMI_WATERACC				= 33;
+	public static final int	RMI_MAP_IMAGE				= 34;
 
 	public MsgBean    msgBean = null;
 	public String     className;

@@ -314,7 +314,7 @@ public class DevGJBean extends RmiBean
 		try
 		{			
 			SmartUpload mySmartUpload = new SmartUpload();
-			mySmartUpload.initialize(pConfig, request, response);
+//			mySmartUpload.initialize(pConfig, request, response);
 			mySmartUpload.setAllowedFilesList("xls,xlsx,XLS,XLSX,");
 			mySmartUpload.upload();
 								

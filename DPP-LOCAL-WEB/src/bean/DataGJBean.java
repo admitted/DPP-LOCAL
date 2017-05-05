@@ -72,7 +72,7 @@ public class DataGJBean extends RmiBean
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 		Calendar c = Calendar.getInstance();    
-		switch(currStatus.getCmd())
+		/*switch(currStatus.getCmd())
 		{
     		case 4:  //最近二十四小时折线图   			
     			SqlETime = df.format(c.getTime());
@@ -90,15 +90,68 @@ public class DataGJBean extends RmiBean
     			SqlBTime = df.format(c.getTime());
     	    	break;
 		
-		}
+		}*/
 
 		msgBean = pRmi.RmiExec(currStatus.getCmd(), this, 0, 25);
-    	request.getSession().setAttribute("User_Graph_Curve_" + Sid, ((Object)msgBean.getMsg()));	
-    	
+    	request.getSession().setAttribute("User_Graph_Curve_" + Sid, ((Object)msgBean.getMsg()));    	
 		currStatus.setJsp("User_Graph_Curve.jsp?Sid=" + Sid + "&Id=" + GJ_Id);				
 		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
 	   	response.sendRedirect(currStatus.getJsp());
 	}
+	
+	/**
+	 * 模拟计算管井水位折线图
+	 * @param request
+	 * @param response
+	 * @param pRmi
+	 * @param pFromZone
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void AnalogGraph(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
+	{
+		getHtmlData(request);
+		currStatus = (CurrStatus)request.getSession().getAttribute("CurrStatus_" + Sid);
+		currStatus.getHtmlData(request, pFromZone);
+		
+		//SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+		//Calendar c = Calendar.getInstance();    
+	/*	switch(currStatus.getCmd())
+		{
+    		case 4:  //最近二十四小时折线图   			
+    			SqlETime = df.format(c.getTime());
+    			c.add(Calendar.HOUR_OF_DAY, -24);
+    			SqlBTime = df.format(c.getTime());
+				break;			
+    		case 5:  //最近一周折线图   			
+    			SqlETime = df.format(c.getTime());
+    			c.add(Calendar.WEEK_OF_MONTH, -1);
+    			SqlBTime = df.format(c.getTime());
+				break;    		
+    		case 6:  //最近一月折线图	
+    			SqlETime = df.format(c.getTime());
+    			c.add(Calendar.MONTH, -1);
+    			SqlBTime = df.format(c.getTime());
+    	    	break;
+		
+		}*/
+
+		//msgBean = pRmi.RmiExec(currStatus.getCmd(), this, 0, 25);
+		AnalogBean analog = new AnalogBean();
+		String WaterAccGJ = "";
+		if(GJ_Id.substring(0,2).equals("YJ")){
+			WaterAccGJ = analog.AnalogWaterAccGj(currStatus.getFunc_Project_Id() + "_" + GJ_Id, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));
+		}else
+		{
+			WaterAccGJ = analog.AnalogSewageAccGj(currStatus.getFunc_Project_Id() + "_" + GJ_Id, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));
+		}
+    	request.getSession().setAttribute("Analog_Graph_Curve_" + Sid, WaterAccGJ);	
+    	
+		currStatus.setJsp("Analog_Graph_Curve.jsp?Sid=" + Sid + "&GJ_Id=" + GJ_Id);				
+		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
+	   	response.sendRedirect(currStatus.getJsp());
+	}
+	
 	public void HistoryData(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
 	{
 		PrintWriter output = null;
@@ -198,6 +251,15 @@ public class DataGJBean extends RmiBean
 					  " GROUP BY SUBSTR(ctime,1,10)" +
 					  " ORDER BY t.ctime " ;
 				break;
+			case 7:
+				Sql = " select '' AS sn, t.project_id, t.project_name, t.gj_id, t.gj_name, t.attr_name, t.ctime, round(avg(t.value),2), t.unit, t.lev, t.des, t.top_height, t.base_height, t.material " +
+						  " FROM view_data_gj t  " +
+						  " where t.gj_id = '"+ GJ_Id +"'" + 
+						  "   and t.project_id = '" + currStatus.getFunc_Project_Id() + "'" +
+						  "   and t.ctime >= date_format('"+currStatus.getVecDate().get(0).toString()+"', '%Y-%m-%d %H-%i-%S')" +
+					  	  "   and t.ctime <= date_format('"+currStatus.getVecDate().get(1).toString()+"', '%Y-%m-%d %H-%i-%S')" +
+						  " GROUP BY SUBSTR(ctime,1,13)" +
+						  " ORDER BY t.ctime " ;
 				
 				
 		}

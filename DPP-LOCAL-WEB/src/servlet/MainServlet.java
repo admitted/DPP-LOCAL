@@ -170,9 +170,13 @@ public class MainServlet extends HttpServlet
         	new UserInfoBean().ExecCmd(request, response, m_Rmi, false);       
         else if (strUrl.equalsIgnoreCase("Admin_IdCheck.do"))						 //人员信息-帐号检测
         	new UserInfoBean().IdCheck(request, response, m_Rmi, false);
-        else if (strUrl.equalsIgnoreCase("Admin_User_Role.do"))				         //人员权限
+        else if (strUrl.equalsIgnoreCase("Admin_User_Role.do"))				         //功能权限
         	new UserRoleBean().ExecCmd(request, response, m_Rmi, false);
-        else if (strUrl.equalsIgnoreCase("Admin_User_RoleOP.do"))				     //人员权限-编辑
+        else if (strUrl.equalsIgnoreCase("Admin_User_RoleOP.do"))				     //功能权限-编辑
+        	new UserRoleBean().RoleOP(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Admin_Manage_Role.do"))				     //管理权限
+        	new UserRoleBean().ExecCmd(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Admin_Manage_RoleOP.do"))				     //管理权限
         	new UserRoleBean().RoleOP(request, response, m_Rmi, false);
         else if (strUrl.equalsIgnoreCase("Admin_Project_Info.do"))	                 //项目信息管理
         	new ProjectInfoBean().ExecCmd(request, response, m_Rmi, false);
@@ -182,12 +186,20 @@ public class MainServlet extends HttpServlet
         	new EquipInfoBean().ExecCmd(request, response, m_Rmi, false); 
         else if (strUrl.equalsIgnoreCase("Equip_IdCheck.do"))						 //设备ID检测
         	new EquipInfoBean().IdCheck(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Equip_Restart.do"))						 //设备重启指令
+        	new EquipInfoBean().Restart(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Equip_Compare_Time.do"))					 //设备对时指令
+        	new EquipInfoBean().Compare_Time(request, response, m_Rmi, false);
 
         /**************************************admin-管井**********************************************/  
         else if (strUrl.equalsIgnoreCase("Admin_ToPo_GJ.do"))					//GIS监控-管井
         	new DevGJBean().ToPo(request, response, m_Rmi, false);  
         else if (strUrl.equalsIgnoreCase("Admin_Drag_GJ.do"))					//GIS监控-管井-更新坐标
-        	new DevGJBean().doDragging(request, response, m_Rmi, false);          
+        	new DevGJBean().doDragging(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Admin_LZGX.do"))						//GIS监控-管井-管线拉直
+        	new DevGXBean().straightenGX(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Admin_HTLZ.do"))						//GIS监控-管井-管线拉直-回退
+        	new DevGXBean().unStraightenGX(request, response, m_Rmi, false);
         else if (strUrl.equalsIgnoreCase("Admin_DevGJ_Info.do"))				//管井查询
         	new DevGJBean().ExecCmd(request, response, m_Rmi, false);           
         else if (strUrl.equalsIgnoreCase("Admin_File_GJ.do"))					//Excel表导入（旧）
@@ -212,10 +224,18 @@ public class MainServlet extends HttpServlet
         	new DevGXBean().ExecCmd(request, response, m_Rmi, false); 
         else if (strUrl.equalsIgnoreCase("Admin_DevGX_Suggest.do"))			         //管线查询
         	new DevGXBean().GXSuggest(request, response, m_Rmi, false); 
+        else if (strUrl.equalsIgnoreCase("Admin_GJ_Scene.do"))	                     //窨井图片上传
+        	new DevGJBean().DetailSenceUp(request, response, m_Rmi, false, Config); 
         
-        /**************************************user-管井**********************************************/  
+        /************************************user-管井**********************************************/  
         else if (strUrl.equalsIgnoreCase("User_ToPo_GJ.do"))				        //GIS监控-管井
         	new DevGJBean().ToPo(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("User_ToPo_GX.do"))			            //GIS监控-管线
+        	new DevGXBean().ToPo(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("User_downloadGIS.do"))			        //GIS监控-导出地图
+        	new MapImageBean().downloadGIS(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("User_drawFrame.do"))			        	//GIS监控-画显示框
+        	new MapImageBean().drawFrame(request, response, m_Rmi, false);
         else if (strUrl.equalsIgnoreCase("User_ToPo_GX.do"))			            //GIS监控-管线
         	new DevGXBean().ToPo(request, response, m_Rmi, false);
         else if (strUrl.equalsIgnoreCase("User_DevGJ_Info.do"))				        //管井查询
@@ -224,7 +244,7 @@ public class MainServlet extends HttpServlet
         	new DevGXBean().ExecCmd(request, response, m_Rmi, false); 
         else if (strUrl.equalsIgnoreCase("User_Equip_Info.do"))	                    //设备查询
         	new EquipInfoBean().ExecCmd(request, response, m_Rmi, false); 
-    
+ 
         else if (strUrl.equalsIgnoreCase("User_DataGJ_His.do"))				        //管井表格数据
         	new DataGJBean().HistoryData(request, response, m_Rmi, false);
         
@@ -233,11 +253,39 @@ public class MainServlet extends HttpServlet
         else if (strUrl.equalsIgnoreCase("User_Announce.do"))				        //tab数据显示
         	new CorpInfoBean().ExecCmd(request, response, m_Rmi, false);    
         
-        /***************************************图表分析*****************************************************/
+        /***********************************user-图表分析*****************************************************/
         else if (strUrl.equalsIgnoreCase("User_Graph_Cut.do"))				        //管段剖面图
         	new DevGXBean().ExecCmd(request, response, m_Rmi, false);  
         else if (strUrl.equalsIgnoreCase("User_Graph_Curve.do"))				    //管井折线图
-        	new DataGJBean().GraphData(request, response, m_Rmi, false);         
+        	new DataGJBean().GraphData(request, response, m_Rmi, false); 
+        
+        /************************************user-管井模拟*****************************************************/
+        else if (strUrl.equalsIgnoreCase("Analog_rainfall.do"))				        //上传数据
+        	new AnalogBean().ImportData(request, response, m_Rmi, false, Config);  
+        else if (strUrl.equalsIgnoreCase("DeleteData.do"))				       		//删除数据
+        	new DevGJBean().DeleteData(request, response, m_Rmi, false);
+        else if (strUrl.equalsIgnoreCase("Analog_ToPo_GJ.do"))				        //查询单个子系统
+        	new DevGJBean().AnalogToPo(request, response, m_Rmi, false);  
+        else if (strUrl.equalsIgnoreCase("FileName_ToPo_GJ.do"))				    //返回子系统号
+        	new DevGJBean().FileToPo(request, response, m_Rmi, false);  
+        else if (strUrl.equalsIgnoreCase("Analog_DevGJ_Info.do"))				    //时段水位深度
+        	new DevGJBean().AnalogExecCmd(request, response, m_Rmi, false); 
+        else if (strUrl.equalsIgnoreCase("Analog_Graph_Cut.do"))				    //时段水位剖面图
+        	new DevGXBean().AnalogExecCmd(request, response, m_Rmi, false);  
+        else if (strUrl.equalsIgnoreCase("Analog_Graph_Curve.do"))				    //管井水位折线
+        	new DataGJBean().AnalogGraph(request, response, m_Rmi, false);  
+        else if (strUrl.equalsIgnoreCase("Analog_WaterAcc.do"))				    	//全部时段积水深度
+        	new DevGJBean().WaterAcc(request, response, m_Rmi, false);  
+        
+        /************************************user-管线模拟*****************************************************/
+        else if (strUrl.equalsIgnoreCase("Analog_DevGX_Info.do"))				    	//管线信息
+        	new DevGXBean().AnalogFlow(request, response, m_Rmi, false); 
+        else if (strUrl.equalsIgnoreCase("Analog_Graph_FlowLoad.do"))				    //流量负荷
+        	new DevGXBean().AnalogFlow(request, response, m_Rmi, false);  
+        else if (strUrl.equalsIgnoreCase("Analog_Graph_ActualFlow.do"))				    //实际流量
+        	new DevGXBean().AnalogFlow(request, response, m_Rmi, false);  
+        else if (strUrl.equalsIgnoreCase("Analog_Graph_FlowRate.do"))				    //流速
+        	new DevGXBean().AnalogFlow(request, response, m_Rmi, false);  
     }
     
     private class Connect extends Thread

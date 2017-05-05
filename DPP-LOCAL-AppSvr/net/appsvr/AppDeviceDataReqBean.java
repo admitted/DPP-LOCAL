@@ -1,5 +1,6 @@
 package net.appsvr;
 
+import net.TcpSvrBase;
 import bean.BaseCmdBean;
 import util.CmdUtil;
 import util.Cmd_Sta;
@@ -60,8 +61,9 @@ public class AppDeviceDataReqBean extends BaseCmdBean {
 	}
 
 	@Override
-	public int execRequest()
+	public int execRequest(TcpSvrBase tcpSvr)
 	{
+		CommUtil.LOG("tcpSvr["+tcpSvr+"]");
 		// TODO Auto-generated method stub
 		int ret = Cmd_Sta.STA_ERROR;
 		String Sql = "";

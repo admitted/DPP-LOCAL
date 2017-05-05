@@ -332,6 +332,20 @@ public class CommUtil
 		} 
 		return retVal;
 	}
+	public static String getTime()
+	{
+		String retVal = "";
+		try
+		{
+			SimpleDateFormat SimFormat = new SimpleDateFormat("yyyyMMddHHmmss"); 
+			retVal = SimFormat.format(new Date());
+		}
+		catch(Exception ex)
+		{
+			 ex.printStackTrace();
+		} 
+		return retVal;
+	}
 //*******************整型转换成其它类型********************************
 	/*
 	 * 整数转换成Hex字符串， 其中length为转换后的Hex宽度

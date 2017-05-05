@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import rmi.Rmi;
 import rmi.RmiBean;
 import util.*;
-
+/** 管理权限和功能权限
+ * @author cui
+ *  与表 role关联
+ */
 public class UserRoleBean extends RmiBean 
 {	
 	public final static long serialVersionUID = RmiBean.RMI_USER_ROLE;
@@ -34,7 +39,8 @@ public class UserRoleBean extends RmiBean
 		msgBean = pRmi.RmiExec(currStatus.getCmd(), this, 0, 25);
 		switch(currStatus.getCmd())
 		{
-			case 0://功能权限
+			case 0:
+				//功能权限
 		    	request.getSession().setAttribute("FP_Role_" + Sid, ((Object)msgBean.getMsg()));
 		    	currStatus.setJsp("FP_Role.jsp?Sid=" + Sid);
 		    	
@@ -42,9 +48,15 @@ public class UserRoleBean extends RmiBean
 		    	msgBean = pRmi.RmiExec(2, this, 0, 25);
 		    	request.getSession().setAttribute("FP_Info_" + Sid, ((Object)msgBean.getMsg()));
 		    	break;
-		    case 1://管理权限
+		    case 1:
+		    	//管理权限
 		    	request.getSession().setAttribute("Manage_Role_" + Sid, ((Object)msgBean.getMsg()));
-		    	currStatus.setJsp("Manage_Role.jsp?Sid=" + Sid);    
+		    	currStatus.setJsp("Manage_Role.jsp?Sid=" + Sid);
+		    	
+		    	//设备配置
+				ProjectInfoBean projectInfoBean = new ProjectInfoBean();
+				msgBean = pRmi.RmiExec(0, projectInfoBean, 0,25);
+				request.getSession().setAttribute("project_Info_" + Sid, (Object)msgBean.getMsg());
 		    	break;
 		}
 		
@@ -108,10 +120,10 @@ public class UserRoleBean extends RmiBean
 		switch (pCmd)
 		{
 			case 0://功能权限
-				Sql = " select t.id, t.cname, t.point from role t where length(t.id) = 3 order by t.id";
+				Sql = " select t.id, t.cname, t.point, t.zoomx, t.zoomy, t.zoomlev from role t where length(t.id) = 3 order by t.id";
 				break;
 			case 1://管理权限
-				Sql = " select t.id, t.cname, t.point from role t where substr(t.id,1,2) = '50' and (length(t.id) = 4 or length(t.id) = 6 or length(t.id) = 8) order by t.id";
+				Sql = " select t.id, t.cname, t.point, t.zoomx, t.zoomy, t.zoomlev from role t where substr(t.id,1,2) = '50' and (length(t.id) = 4 or length(t.id) = 6 or length(t.id) = 8) order by t.id";
 				break;
 			case 2://功能点
 				Sql = " select t.id, t.cname, '' as point from fp_info t where t.status = '0' order by t.id";
@@ -130,7 +142,7 @@ public class UserRoleBean extends RmiBean
 				break;
 			case 14://管理权限添加
 				Sql = " insert into role(id, cname, point)values('"+ Id +"', '"+ CName +"', '"+ Point +"')";
-				break;
+				break;	
 		}
 		return Sql;
 	}
@@ -143,6 +155,9 @@ public class UserRoleBean extends RmiBean
 			setId(pRs.getString(1));
 			setCName(pRs.getString(2));
 			setPoint(pRs.getString(3));
+			setZoomX(pRs.getString(4));
+			setZoomY(pRs.getString(5));
+			setZoomLev(pRs.getString(6));
 		}
 		catch (SQLException sqlExp)
 		{
@@ -159,6 +174,9 @@ public class UserRoleBean extends RmiBean
 			setId(CommUtil.StrToGB2312(request.getParameter("Id")));
 			setCName(CommUtil.StrToGB2312(request.getParameter("CName")));
 			setPoint(CommUtil.StrToGB2312(request.getParameter("Point")));
+			setZoomX(CommUtil.StrToGB2312(request.getParameter("ZoomX")));
+			setZoomY(CommUtil.StrToGB2312(request.getParameter("ZoomY")));
+			setZoomLev(CommUtil.StrToGB2312(request.getParameter("ZoomLev")));
 			setRoleList(CommUtil.StrToGB2312(request.getParameter("RoleList")));
 			setSid(CommUtil.StrToGB2312(request.getParameter("Sid")));
 		}
@@ -172,9 +190,44 @@ public class UserRoleBean extends RmiBean
 	private String Id;
 	private String CName;
 	private String Point;
+	private String ZoomX;
+	private String ZoomY;
+	private String ZoomLev;
+	
 	private String RoleList;
 	private String Sid;
 	
+	
+	public String getZoomX()
+	{
+		return ZoomX;
+	}
+
+	public void setZoomX(String zoomX)
+	{
+		ZoomX = zoomX;
+	}
+
+	public String getZoomY()
+	{
+		return ZoomY;
+	}
+
+	public void setZoomY(String zoomY)
+	{
+		ZoomY = zoomY;
+	}
+
+	public String getZoomLev()
+	{
+		return ZoomLev;
+	}
+
+	public void setZoomLev(String zoomLev)
+	{
+		ZoomLev = zoomLev;
+	}
+
 	public String getRoleList() {
 		return RoleList;
 	}

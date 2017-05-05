@@ -10,13 +10,16 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
+
 import net.Md5;
 import net.MsgHeadBean;
 import net.TcpClient;
 import net.TcpSvrBase;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+
 import container.ActionContainer;
 import bean.BaseCmdBean;
 import util.*;
@@ -57,8 +60,17 @@ public class TcpSvrAppGateWay extends TcpSvrBase
 		if(!init(m_iPort, m_iTimeOut))
 			return false;
 		objClientTable = new Hashtable<String, ClientSocket>();
-		MsgCtrl msgCtrl = new MsgCtrl();
-		msgCtrl.start();
+		MsgCtrl msgCtrl;
+		try
+		{
+			msgCtrl = new MsgCtrl(this);
+			msgCtrl.start();
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 		return true;
 	}
 	
@@ -280,6 +292,11 @@ public class TcpSvrAppGateWay extends TcpSvrBase
 	
 	private class MsgCtrl extends Thread
 	{
+		private TcpSvrBase m_TcpSvr = null;//TCP 服务器
+		public MsgCtrl(TcpSvrBase pTcpSvr)throws Exception
+		{	    
+			m_TcpSvr = pTcpSvr;
+		} 
 		public void run()
 		{
 			String dealData = "";
@@ -311,12 +328,12 @@ public class TcpSvrAppGateWay extends TcpSvrBase
 					{
 						case Cmd_Sta.COMM_SUBMMIT://提交
 						{
-							CommUtil.LOG("PlatForm Submit [" + strClientKey + "] " + "[" + dealData + "]");
+							CommUtil.LOG("PlatForm Submit [" + strClientKey + "] " + "[" + dealData + "] " + "[" + new String(data) + "] ");
 							BaseCmdBean cmdBean = BaseCmdBean.getBean(Integer.parseInt(dealCmd), m_DbUtil);	
 							if(null != cmdBean)
 							{
 								cmdBean.parseReqest(strClientKey, dealData, data);
-								cmdBean.execRequest();
+								cmdBean.execRequest(m_TcpSvr);
 								
 								if(1 == m_iStatus)
 								{

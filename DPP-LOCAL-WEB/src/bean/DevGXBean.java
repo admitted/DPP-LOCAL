@@ -7,9 +7,11 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -88,11 +90,21 @@ public class DevGXBean extends RmiBean
 			case 4://剖面图
 				msgBean = pRmi.RmiExec(currStatus.getCmd(), this, 0, 25);
 				request.getSession().setAttribute("User_Graph_Cut_GX_" + Sid, (Object)msgBean.getMsg());				
+				@SuppressWarnings("rawtypes")
+				ArrayList gxObj = (ArrayList)(Object)msgBean.getMsg();
+				
 				DevGJBean tmpGJBean = new DevGJBean();
 				tmpGJBean.setProject_Id(currStatus.getFunc_Project_Id());
 				tmpGJBean.setSubsys_Id(Id.substring(2, 5));
+				
 				msgBean = pRmi.RmiExec(5, tmpGJBean, 0, 25);
-				request.getSession().setAttribute("User_Graph_Cut_GJ_" + Sid, (Object)msgBean.getMsg());
+				@SuppressWarnings("rawtypes")
+				ArrayList gjObj = (ArrayList)(Object)msgBean.getMsg();
+				
+				AnalogBean analog = new AnalogBean();
+				@SuppressWarnings("rawtypes")
+				ArrayList gjList = analog.AnalogGJList(gjObj, gxObj, Id);
+				request.getSession().setAttribute("User_Graph_Cut_GJ_" + Sid, gjList);
 				currStatus.setJsp("User_Graph_Cut.jsp?Sid=" + Sid + "&Id=" + Id);
 				break;
 		}
@@ -101,6 +113,114 @@ public class DevGXBean extends RmiBean
 	   	response.sendRedirect(currStatus.getJsp());
 	}
 	
+	/**
+	 * 时段水位深度剖面图
+	 * @param request
+	 * @param response
+	 * @param pRmi
+	 * @param pFromZone
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void AnalogExecCmd(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
+	{
+		getHtmlData(request);
+		currStatus = (CurrStatus)request.getSession().getAttribute("CurrStatus_" + Sid);
+		currStatus.getHtmlData(request, pFromZone);
+
+		int timePeriod = CommUtil.StrToInt(request.getParameter("TimePeriod"));
+		
+		switch(currStatus.getCmd())
+		{
+			case 4://剖面图
+				msgBean = pRmi.RmiExec(currStatus.getCmd(), this, 0, 25);
+				request.getSession().setAttribute("Analog_Graph_Cut_GX_" + Sid, (Object)msgBean.getMsg());				
+				DevGJBean tmpGJBean = new DevGJBean();
+				tmpGJBean.setProject_Id(currStatus.getFunc_Project_Id());
+				tmpGJBean.setSubsys_Id(Id.substring(2, 5));
+				msgBean = pRmi.RmiExec(5, tmpGJBean, 0, 25);
+				request.getSession().setAttribute("Analog_Graph_Cut_GJ_" + Sid, (Object)msgBean.getMsg());
+				
+				AnalogBean analogBean = new AnalogBean();
+				String WaterLev = "";
+				if(Id.substring(0,2).equals("YJ"))
+				{
+					WaterLev = analogBean.AnalogWaterLev(currStatus.getFunc_Project_Id() + "_" + Id.substring(0,5), timePeriod, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));
+				}else
+				{
+					WaterLev = analogBean.AnalogSewageLev(currStatus.getFunc_Project_Id() + "_" + Id.substring(0,5), timePeriod, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));
+				}
+				//System.out.println("WaterLev"+WaterLev);
+				request.getSession().setAttribute("Analog_WaterLev_" + Sid, WaterLev);				
+				currStatus.setJsp("Analog_Graph_Cut.jsp?Sid=" + Sid 
+						+ "&TimePeriod=" + timePeriod 
+						+ "&Id=" + Id);
+				break;
+		}
+		
+		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
+	   	response.sendRedirect(currStatus.getJsp());
+	}
+	
+	public void AnalogFlow(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
+	{
+		getHtmlData(request);
+		currStatus = (CurrStatus)request.getSession().getAttribute("CurrStatus_" + Sid);
+		currStatus.getHtmlData(request, pFromZone);
+		
+		String gjId = CommUtil.StrToGB2312(request.getParameter("gjId"));
+		String gxId = CommUtil.StrToGB2312(request.getParameter("gxId"));
+		
+		Id = gxId;
+		
+		AnalogBean analogBean = new AnalogBean();
+		switch(currStatus.getCmd())
+		{
+			case 0://查询单个gj信息
+				msgBean = pRmi.RmiExec(3, this, 0, 0);
+				request.getSession().setAttribute("Analog_DevGX_Info_" + Sid, (DevGXBean)((ArrayList<?>)msgBean.getMsg()).get(0));				
+				currStatus.setJsp("Analog_DevGX_Info.jsp?Sid=" + Sid + "&gjId="+gjId+"&gxId="+gxId+"&Project_Id="+currStatus.getFunc_Project_Id());
+				break;
+			case 1://流量负荷
+				String WaterFlowLoad = "";
+				if(gjId.substring(0,2).equals("YJ"))
+				{
+					WaterFlowLoad = analogBean.AnalogFlowLoad(currStatus.getFunc_Project_Id()+"_"+gjId, gxId, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));
+				}else
+				{
+					WaterFlowLoad = analogBean.SewageFlowLoad(currStatus.getFunc_Project_Id()+"_"+gjId, gxId, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));//污水
+				}
+				request.getSession().setAttribute("Analog_Graph_FlowLoad_" + Sid, WaterFlowLoad);				
+				currStatus.setJsp("Analog_Graph_FlowLoad.jsp?Sid=" + Sid);
+				break;
+			case 2://实际流量
+				String WaterActualFlow = "";
+				if(gjId.substring(0,2).equals("YJ"))
+				{
+					WaterActualFlow = analogBean.AnalogActualFlow(currStatus.getFunc_Project_Id()+"_"+gjId, gxId, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));
+				}else
+				{
+					WaterActualFlow = analogBean.SewageActualFlow(currStatus.getFunc_Project_Id()+"_"+gjId, gxId, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));//污水
+				}
+				request.getSession().setAttribute("Analog_Graph_ActualFlow_" + Sid, WaterActualFlow);				
+				currStatus.setJsp("Analog_Graph_ActualFlow.jsp?Sid=" + Sid);
+				break;
+			case 3://流量负荷
+				String WaterFlowRate = "";
+				if(gjId.substring(0,2).equals("YJ"))
+				{
+					WaterFlowRate = analogBean.AnalogFlowRate(currStatus.getFunc_Project_Id()+"_"+gjId, gxId, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));
+				}else
+				{
+					WaterFlowRate = analogBean.SewageFlowRate(currStatus.getFunc_Project_Id()+"_"+gjId, gxId, Double.parseDouble(currStatus.getFunc_Sub_Type_Id()));//污水
+				}
+				request.getSession().setAttribute("Analog_Graph_FlowRate_" + Sid, WaterFlowRate);				
+				currStatus.setJsp("Analog_Graph_FlowRate.jsp?Sid=" + Sid);
+				break;
+		}
+		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
+	   	response.sendRedirect(currStatus.getJsp());
+	}
 	
 	public void GXSuggest(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
 	{
@@ -171,6 +291,233 @@ public class DevGXBean extends RmiBean
 		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
 		outprint.write(Resp);
 	}
+	/**
+	 * 管线拉直技术
+	 * @param request
+	 * @param response
+	 * @param pRmi
+	 * @param pFromZone
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void straightenGX(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
+	{
+		getHtmlData(request);
+		currStatus = (CurrStatus) request.getSession().getAttribute("CurrStatus_" + Sid);
+		currStatus.getHtmlData(request, pFromZone);
+		
+		PrintWriter outprint = response.getWriter();
+		String Resp = "0000";
+		String Bearing = String.valueOf(request.getParameter("Bearing"));
+		String StartGJ = String.valueOf(request.getParameter("StartGJ"));
+		String EndGJ = String.valueOf(request.getParameter("EndGJ"));
+		
+		DecimalFormat df = new DecimalFormat("####.######");
+
+		Id = StartGJ;
+		msgBean = pRmi.RmiExec(4, this, 0, 0);
+		ArrayList<?> gxObj = (ArrayList<?>) msgBean.getMsg();
+
+		DevGJBean gjBean = new DevGJBean();
+		gjBean.setProject_Id(currStatus.getFunc_Project_Id());
+		gjBean.setId(StartGJ.substring(0, 5));
+		msgBean = pRmi.RmiExec(7, gjBean, 0, 0);
+		ArrayList<?> gjObj = (ArrayList<?>) msgBean.getMsg();
+
+		ArrayList<Object> gjList = this.pickUpGJGX(gjObj, gxObj, StartGJ, EndGJ);
+		if(null != gjList && gjList.size() > 0)
+		{
+			double StartGJLng = 0.0;	//起点经度 X
+			double StartGJLat = 0.0;	//起点维度 Y
+			double EndGJLng = 0.0;		//终点经度 X
+			double EndGJLat = 0.0;		//终点维度 Y
+			double k = 0.0;
+			double b = 0.0;
+			
+			double NewGJLng = 0.0;		//直线中新点经度 X
+			double NewGJLat = 0.0;		//直线中新点维度 Y
+			String reqReal = "";		//记录此次修改的数据，用于回退
+			
+			String GJLng = "";			//直线中原来点经度 X
+			String GJLat = "";			//直线中原来点维度 Y
+			String GJId = "";			
+			StartGJLat = Double.parseDouble(((DevGJBean) gjList.get(0)).getLatitude());
+			StartGJLng = Double.parseDouble(((DevGJBean) gjList.get(0)).getLongitude());
+			EndGJLat = Double.parseDouble(((DevGJBean) gjList.get(gjList.size() - 1)).getLatitude());
+			EndGJLng = Double.parseDouble(((DevGJBean) gjList.get(gjList.size() - 1)).getLongitude());
+			if(Bearing.equals("1"))			//南北向	维度（Y轴）不变，只变化经度（X轴）
+			{
+				k = (EndGJLng - StartGJLng) / (EndGJLat - StartGJLat);
+				b = StartGJLng - (StartGJLat * (EndGJLng - StartGJLng)) / (EndGJLat - StartGJLat);
+				for (int i = 0; i < gjList.size(); i++)
+				{
+					DevGJBean Bean = (DevGJBean) gjList.get(i);
+					GJId = Bean.getId();
+					GJLng = Bean.getLongitude();
+					GJLat = Bean.getLatitude();
+					NewGJLng = k * Double.parseDouble(GJLat) + b;
+					reqReal += GJId + "," + GJLng + "," + GJLat + ";";
+					Bean.setLongitude(df.format(NewGJLng));
+					msgBean = pRmi.RmiExec(15, Bean, 0, 0);
+					if (msgBean.getStatus() != MsgBean.STA_SUCCESS)
+					{
+						Resp = "9999";
+						break;
+					}
+				}
+				Resp += reqReal;
+			}
+			else if(Bearing.equals("2"))	//东西向	经度（X轴）不变，只变化维度（Y轴）
+			{
+				k = (EndGJLat - StartGJLat) / (EndGJLng - StartGJLng);
+				b = StartGJLat - (StartGJLng * (EndGJLat - StartGJLat)) / (EndGJLng - StartGJLng);
+				for (int i = 0; i < gjList.size(); i++)
+				{
+					DevGJBean Bean = (DevGJBean) gjList.get(i);
+					GJId = Bean.getId();
+					GJLng = Bean.getLongitude();
+					GJLat = Bean.getLatitude();
+					NewGJLat = k * Double.parseDouble(GJLng) + b;
+					reqReal += GJId + "," + GJLng + "," + GJLat + ";";
+					Bean.setLatitude(df.format(NewGJLat));
+					msgBean = pRmi.RmiExec(15, Bean, 0, 0);
+					if (msgBean.getStatus() != MsgBean.STA_SUCCESS)
+					{
+						Resp = "9999";
+						break;
+					}
+				}
+				Resp += reqReal;
+			}
+			else							//斜向
+			{
+				k = (EndGJLat - StartGJLat) / (EndGJLng - StartGJLng);
+				for (int i = 0; i < gjList.size(); i++)
+				{
+					DevGJBean Bean = (DevGJBean) gjList.get(i);
+					GJId = Bean.getId();
+					GJLng = Bean.getLongitude();
+					GJLat = Bean.getLatitude();
+					reqReal += GJId + "," + GJLng + "," + GJLat + ";";
+					NewGJLng = ((Double.parseDouble(GJLng) + StartGJLng) / 2)
+							+ ((Double.parseDouble(GJLat) - StartGJLat) / (2*k));
+					NewGJLat = ((k*(Double.parseDouble(GJLng) - StartGJLng)) / 2)
+							+ ((Double.parseDouble(GJLat) + StartGJLat) / 2);
+					Bean.setLongitude(df.format(NewGJLng));
+					Bean.setLatitude(df.format(NewGJLat));
+					msgBean = pRmi.RmiExec(15, Bean, 0, 0);
+					if (msgBean.getStatus() != MsgBean.STA_SUCCESS)
+					{
+						Resp = "9999";
+						break;
+					}
+				}
+				Resp += reqReal;
+			}
+		}
+		else
+		{
+			Resp = "1111";
+		}
+		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
+		outprint.write(Resp);
+	}
+	
+	/**
+	 * 管线拉直 回退
+	 * @param request
+	 * @param response
+	 * @param pRmi
+	 * @param pFromZone
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void unStraightenGX(HttpServletRequest request, HttpServletResponse response, Rmi pRmi, boolean pFromZone) throws ServletException, IOException
+	{
+		getHtmlData(request);
+		currStatus = (CurrStatus) request.getSession().getAttribute("CurrStatus_" + Sid);
+		currStatus.getHtmlData(request, pFromZone);
+		
+		PrintWriter outprint = response.getWriter();
+		String Resp = "0000";
+		String reqReal = String.valueOf(request.getParameter("reqReal"));
+		
+		DevGJBean gjBean = new DevGJBean();
+		String[] gjArray = reqReal.split(";");
+		String[] gjObj = new String[3];
+		for(int i = 0; i < gjArray.length; i ++)
+		{
+			gjObj = gjArray[i].split(",");
+			gjBean.setId(gjObj[0]);
+			gjBean.setProject_Id(currStatus.getFunc_Project_Id());
+			gjBean.setLongitude(gjObj[1]);
+			gjBean.setLatitude(gjObj[2]);
+			msgBean = pRmi.RmiExec(15, gjBean, 0, 0);
+			if (msgBean.getStatus() != MsgBean.STA_SUCCESS)
+			{
+				Resp = "9999";
+				break;
+			}
+		}
+		request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);
+		outprint.write(Resp);
+	}
+	/**
+	 * 整理管井数据
+	 * @param gjObj
+	 * @param gxObj
+	 * @param StartGJ
+	 * @param EndGJ
+	 * @return
+	 */
+	public ArrayList<Object> pickUpGJGX(ArrayList<?> gjObj, ArrayList<?> gxObj, String StartGJ, String EndGJ)
+	{
+		//gjObj ArrayList转Hash
+		AnalogBean analogBean = new AnalogBean();
+		Hashtable<String, DevGJBean> objGJTable = null;
+		objGJTable = new Hashtable<String, DevGJBean>(); 
+		Iterator<?> iterGJ = gjObj.iterator();
+		while(iterGJ.hasNext())
+		{
+			DevGJBean gjBean = (DevGJBean)iterGJ.next();
+			String gjId = gjBean.getId();
+			analogBean.HashPut(objGJTable, gjId, gjBean);
+		}
+		//gxObj ArrayList转Hash
+		Hashtable<String, DevGXBean> objGXTable = null;
+		objGXTable = new Hashtable<String, DevGXBean>(); 
+		Iterator<?> iterGX = gxObj.iterator();
+		while(iterGX.hasNext())
+		{
+			DevGXBean gxBean = (DevGXBean)iterGX.next();
+			String gxId = gxBean.getId();
+			analogBean.HashPut(objGXTable, gxId, gxBean);
+		}
+		DevGJBean nextGJ = (DevGJBean)analogBean.HashGet(objGJTable, StartGJ);			
+		ArrayList<Object> gjList = new ArrayList<Object>();		//管井ArrayList
+		gjList.add(nextGJ);
+		DevGXBean nextGX = new DevGXBean();
+		int option = 0;
+		do
+		{
+			String outGXId = nextGJ.getOut_Id();
+			nextGX = (DevGXBean)analogBean.HashGet(objGXTable, outGXId);
+			String outGJId = nextGX.getEnd_Id();
+			nextGJ = (DevGJBean)analogBean.HashGet(objGJTable, outGJId);
+			gjList.add(nextGJ);
+			if(nextGJ.getId().equals(EndGJ) || nextGJ.getFlag().equals("2"))
+			{
+				option = 1;
+				if(!nextGJ.getId().equals(EndGJ))
+				{
+					gjList.clear();
+				}
+			}
+		}
+		while(option == 0);
+		return gjList;
+	}
+	
 	
 	
 	/** 导入Excel文档  解析文档中的管线详细数据  
@@ -356,7 +703,7 @@ public class DevGXBean extends RmiBean
 				}				
 			}
 			
-			currStatus.setJsp("Update_Excel.jsp?Sid=" + Sid + "&Project_Id=" + Project_Id);
+			currStatus.setJsp("Import_Excel.jsp?Sid=" + Sid + "&Project_Id=" + Project_Id);
 			request.getSession().setAttribute("CurrStatus_" + Sid, currStatus);	
 		   	response.sendRedirect(currStatus.getJsp());
 		}
@@ -599,6 +946,13 @@ public class DevGXBean extends RmiBean
 				      " and substr(t.id, 3, 3) = '"+ Id.substring(2,5) +"'" +
 				      " order by t.id ";
 			   break;
+		    case 7://查询（下载地图）
+		    	Sql = " select t.id, t.diameter, t.length, t.start_id, t.end_id, t.start_height, t.end_height, t.material, t.buried_year, t.data_lev, t.project_id, t.project_name, t.equip_id, t.equip_name ,round((t.curr_data),2)" +
+		    			" from view_dev_gx t " +	
+		    			" where t.project_id = '" + Project_Id + "'" + 
+		    			" and substr(t.id, 3, 3) = '"+ Id.substring(2,5) +"'" +
+		    			" order by t.id ";
+		    	break;
 		    case 10://添加
 		    	Sql = " insert into dev_gx(id, diameter, length, start_id, end_id, start_height, end_height, material, buried_year, data_lev, project_id)" +
 		    			"values('"+ Id +"', '"+ Diameter +"', '"+ Length +"', '"+ Start_Id +"', '"+ End_Id +"',  '"+ Start_Height +"', '"+ End_Height +"',  '"+Material +"', '"+Buried_Year +"', '"+Data_Lev +"', '"+ Project_Id +"')";

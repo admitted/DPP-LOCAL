@@ -134,6 +134,11 @@ public class UserInfoBean extends RmiBean
 					msgBean = pRmi.RmiExec(0, projectInfoBean, 0, 25); 
 					request.getSession().setAttribute("Project_Info_" + Sid, (Object)msgBean.getMsg());
 					
+					//功能权限
+					UserRoleBean roleBean = new UserRoleBean();
+			    	msgBean = pRmi.RmiExec(0, roleBean, 0, 25);
+			    	request.getSession().setAttribute("User_Fp_Role_" + Sid, ((Object)msgBean.getMsg()));
+
 					//历史数据
 					
 					/*//管线查询
@@ -143,11 +148,12 @@ public class UserInfoBean extends RmiBean
 					currStatus.setTotalRecord(msgBean.getCount());*/
 					
 			    	//管理权限
-//					UserRoleBean roleBean = new UserRoleBean();
-//			    	msgBean = pRmi.RmiExec(1, roleBean, 0, 25);
-//			    	request.getSession().setAttribute("User_Manage_Role_" + Sid, ((Object)msgBean.getMsg()));
-
-			    	Url = "User_Project_Option.jsp?Sid=" + Sid;
+					UserRoleBean roleBeanManage = new UserRoleBean();
+			    	msgBean = pRmi.RmiExec(1, roleBeanManage, 0, 25);
+			    	request.getSession().setAttribute("User_Manage_Role_" + Sid, ((Object)msgBean.getMsg()));
+			    	
+			    	Url = "project_choose.jsp?Sid=" + Sid;
+			    //	Url = "Project_choose.jsp?Sid=" + Sid;
 				//	Url = "user/MapMain.jsp?Sid=" + Sid;
 					
 				}

@@ -1,7 +1,11 @@
 package util;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -876,7 +880,24 @@ public class CommUtil
 		}
 		return retVal;
 	}
-	
+	//inputStream转outputStream
+    public OutputStream inputStreamToOutputStream(InputStream in) throws Exception
+    {
+        ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
+        int ch;
+        while ((ch = in.read()) != -1) {   
+            swapStream.write(ch);   
+        }
+        return swapStream;
+    }
+    //outputStream转inputStream
+    public InputStream outputStreamToInputStream(OutputStream out) throws Exception
+    {
+        ByteArrayOutputStream   baos=new   ByteArrayOutputStream();
+        baos=(ByteArrayOutputStream) out;
+        ByteArrayInputStream swapStream = new ByteArrayInputStream(baos.toByteArray());
+        return swapStream;
+    }
 	/** 判断一个字符串是不是数字[可以判断小数，正负数，整数]
 	 * @param str
 	 * @return

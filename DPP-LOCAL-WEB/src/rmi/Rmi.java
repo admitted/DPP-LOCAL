@@ -1,6 +1,7 @@
 package rmi;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+
 import util.*;
 
 /**远程方法调用接口
@@ -10,7 +11,6 @@ import util.*;
 public interface Rmi extends Remote
 {
 	public boolean Test()throws RemoteException;
-	
 	
 	/**根据cmd命令 , 传入的pBean , CurrPage当前页码 
 	 **case 0: 查询 ;
@@ -22,4 +22,6 @@ public interface Rmi extends Remote
 	 * @see rmi.Rmi#RmiExec(int, rmi.RmiBean, int, int)
 	 */
 	public MsgBean RmiExec(int pCmd, RmiBean pBean, int CurrPage, int PageSize) throws RemoteException;
+	
+	public String Client(int pCmd, String pClientId, String pOprator)throws RemoteException;
 }

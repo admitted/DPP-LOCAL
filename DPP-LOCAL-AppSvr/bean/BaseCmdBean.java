@@ -1,9 +1,8 @@
 package bean;
 
-import net.appsvr.AppDeviceAlarmReqBean;
-import net.appsvr.AppDeviceAlertReqBean;
+import net.TcpSvrBase;
 import net.appsvr.AppDeviceDataReqBean;
-import net.appsvr.AppDeviceStatusReqBean;
+import net.appsvr.RmiDeviceDataReqBean;
 import util.*;
 
 public abstract class BaseCmdBean
@@ -28,17 +27,12 @@ public abstract class BaseCmdBean
 		BaseCmdBean retBean = null;
 		switch(Cmd)
 		{
-			case Cmd_Sta.CMD_SUBMIT_1000:
-				retBean = new AppDeviceStatusReqBean(Cmd, SessionId(), dbUtil);
-				break;
 			case Cmd_Sta.CMD_SUBMIT_1001:
 				retBean = new AppDeviceDataReqBean(Cmd, SessionId(), dbUtil);
 				break;
-			case Cmd_Sta.CMD_SUBMIT_1003:
-				retBean = new AppDeviceAlarmReqBean(Cmd, SessionId(), dbUtil);
-				break;
-			case Cmd_Sta.CMD_SUBMIT_1004:
-				retBean = new AppDeviceAlertReqBean(Cmd, SessionId(), dbUtil);
+			case Cmd_Sta.CMD_SUBMIT_0001:
+			case Cmd_Sta.CMD_SUBMIT_0002:
+				retBean = new RmiDeviceDataReqBean(Cmd, SessionId(), dbUtil);
 				break;
 		}
 		return retBean;
@@ -53,7 +47,7 @@ public abstract class BaseCmdBean
 		return Seq;
 	}
 	public abstract void parseReqest(String key, String strRequest, byte[] strData);
-	public abstract int execRequest();
+	public abstract int execRequest(TcpSvrBase tcpSvr);
 
 	public abstract void parseReponse(String strResponse);
 	public abstract void execResponse();
@@ -105,5 +99,11 @@ public abstract class BaseCmdBean
 
 	public void setSeq(String seq) {
 		Seq = seq;
+	}
+
+	public int execRequest()
+	{
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
