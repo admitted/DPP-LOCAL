@@ -119,6 +119,9 @@ public class AppDeviceDataReqBean extends BaseCmdBean {
         return ret;
     }
 
+    /**
+     * Í¨Öª³¬Ê±
+     */
     public void noticeTimeOut() {
 
     }

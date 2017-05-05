@@ -3,115 +3,119 @@ package bean;
 import net.MsgCtrl;
 import util.*;
 
-public abstract class BaseCmdBean
-{
-	public static long m_SessionId = (new java.util.Date().getTime()/1000);
-	private String actionSource = "";
-	private String Reserve = "";
-	private String Status = "0000";
-	private int Action = 0;	
-	private int TestTime = (int)(new java.util.Date().getTime()/1000);
-	private String Seq = "";
-	public DBUtil m_DbUtil = null;
-	private String BeanName = "";
+public abstract class BaseCmdBean {
 
-	public BaseCmdBean(int action, String seq){
-		Action = action;
-		Seq = seq;
-	}
-	
-	public static BaseCmdBean getBean(int Cmd, String Seq)
-	{
-		BaseCmdBean retBean = null;
-		switch(Cmd)
-		{
-			case Cmd_Sta.CMD_SUBMIT_1001:
-				retBean = new AppDeviceDataReqBean(Cmd, Seq);
-				break;
-			case Cmd_Sta.CMD_SUBMIT_0001:
-				retBean = new DTURestartBean(Cmd, Seq);
-				break;
-			case Cmd_Sta.CMD_SUBMIT_0002:
-				retBean = new DTUUpdateTimeBean(Cmd, Seq);
-				break;
-		}
-		return retBean;
-	}
-	public static synchronized String SessionId()
-	{
-		long ret = m_SessionId++;
-		return CommUtil.LongToStringLeftFillZero(ret, 20);
-	}
-	public String GetSessionId()
-	{
-		return Seq;
-	}
-	public abstract void parseReqest(String key, String strRequest, byte[] strData);
-	public abstract int execRequest(MsgCtrl msgCtrl);
+    public static long m_SessionId = (new java.util.Date().getTime() / 1000);
+    private String actionSource = "";
+    private String Reserve = "";
+    private String Status = "0000";
+    private int Action = 0;
+    private int TestTime = (int) (new java.util.Date().getTime() / 1000);
+    private String Seq = "";
+    public DBUtil m_DbUtil = null;
+    private String BeanName = "";
 
-	public abstract void parseReponse(String strResponse);
-	public abstract void execResponse(MsgCtrl msgCtrl);
-	
-	public abstract void noticeTimeOut();
-	public String getActionSource() {
-		return actionSource;
-	}
+    public BaseCmdBean(int action, String seq) {
+        Action = action;
+        Seq = seq;
+    }
 
-	public void setActionSource(String actionSource) {
-		this.actionSource = actionSource;
-	}
+    /**
+     * 获取数据业务处理 bean
+     */
+    public static BaseCmdBean getBean(int Cmd, String Seq) {
+        BaseCmdBean retBean = null;
+        switch (Cmd) {
+            case Cmd_Sta.CMD_SUBMIT_1001:
+                retBean = new AppDeviceDataReqBean(Cmd, Seq);
+                break;
+            case Cmd_Sta.CMD_SUBMIT_0001:
+                retBean = new DTURestartBean(Cmd, Seq);
+                break;
+            case Cmd_Sta.CMD_SUBMIT_0002:
+                retBean = new DTUUpdateTimeBean(Cmd, Seq);
+                break;
+        }
+        return retBean;
+    }
 
-	public String getReserve() {
-		return Reserve;
-	}
+    public static synchronized String SessionId() {
+        long ret = m_SessionId++;
+        return CommUtil.LongToStringLeftFillZero(ret, 20);
+    }
 
-	public void setReserve(String reserve) {
-		Reserve = reserve;
-	}
+    public String GetSessionId() {
+        return Seq;
+    }
 
-	public int getAction() {
-		return Action;
-	}
+    public abstract void parseReqest(String key, String strRequest, byte[] strData);
 
-	public void setAction(int action) {
-		Action = action;
-	}
+    public abstract int execRequest(MsgCtrl msgCtrl);
 
-	public int getTestTime() {
-		return TestTime;
-	}
+    public abstract void parseReponse(String strResponse);
 
-	public void setTestTime(int testTime) {
-		TestTime = testTime;
-	}
+    public abstract void execResponse(MsgCtrl msgCtrl);
 
-	public String getStatus() {
-		return Status;
-	}
+    public abstract void noticeTimeOut();
 
-	public void setStatus(String status) {
-		Status = status;
-	}
+    public String getActionSource() {
+        return actionSource;
+    }
 
-	public String getSeq() {
-		return Seq;
-	}
+    public void setActionSource(String actionSource) {
+        this.actionSource = actionSource;
+    }
 
-	public void setSeq(String seq) {
-		Seq = seq;
-	}
+    public String getReserve() {
+        return Reserve;
+    }
 
-	public int execRequest()
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    public void setReserve(String reserve) {
+        Reserve = reserve;
+    }
 
-	public String getBeanName() {
-		return BeanName;
-	}
+    public int getAction() {
+        return Action;
+    }
 
-	public void setBeanName(String beanName) {
-		BeanName = beanName;
-	}
+    public void setAction(int action) {
+        Action = action;
+    }
+
+    public int getTestTime() {
+        return TestTime;
+    }
+
+    public void setTestTime(int testTime) {
+        TestTime = testTime;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
+
+    public String getSeq() {
+        return Seq;
+    }
+
+    public void setSeq(String seq) {
+        Seq = seq;
+    }
+
+    public int execRequest() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public String getBeanName() {
+        return BeanName;
+    }
+
+    public void setBeanName(String beanName) {
+        BeanName = beanName;
+    }
 }
