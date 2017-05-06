@@ -28,13 +28,13 @@ public class TcpSvr extends Thread {
     public static final int STATUS_CLIENT_OFFLINE = 1;
     public static final String TYPE_OPERATOR = "0";
 
-    public Hashtable<String, ClientSocket> objClientTable = null;    //登陆客户端列表
+    public Hashtable<String, ClientSocket> objClientTable = null;    // 登陆客户端列表
 
     public Hashtable<String, ClientSocket> getObjClientTable() {
         return objClientTable;
     }
 
-    public Hashtable<String, String> objTelStaTable = null;          //服务网关表
+    public Hashtable<String, String> objTelStaTable = null;          // 服务网关表
 
     //TCP服务器
     private ServerSocket objTcpSvrSock = null;
@@ -68,7 +68,10 @@ public class TcpSvr extends Thread {
         }
     }
 
-    //初始化Socket
+    /**
+     * 初始化 objTcpSvrSock TCP服务器
+     * @return
+     */
     public boolean init() {
         try {
             objTcpSvrSock = new ServerSocket(m_iPort); // 监听 61020 端口
@@ -86,12 +89,17 @@ public class TcpSvr extends Thread {
         }
     }
 
-    //监听Socket连接
+    /**
+     * (循环调用accept()等待客户端连接) 多客户端通信
+     * 不断监听 61020 端口 [TcpSvr本身是一个线程]
+     * @see java.lang.Thread#run()
+     */
     public void run() {
         while (true) {
             try {
-                Socket objClient = objTcpSvrSock.accept(); // 服务器接收一个客户包
-                objClient.setSoTimeout(m_iTimeOut * 1000); // 60*1000
+                Socket objClient = objTcpSvrSock.accept(); // 服务器抓包
+                objClient.setSoTimeout(m_iTimeOut * 1000); // 通过指定超时值 启用/禁用 SO_TIMEOUT，以毫秒为单位。
+                                                           // 超过时间就断开客户端
 
                 DataInputStream RecvChannel = new DataInputStream(objClient.getInputStream());
                 byte[] Buffer = new byte[1024];
@@ -103,42 +111,40 @@ public class TcpSvr extends Thread {
 
                 //Start..........................................
                 //Send Original:
-                //46 00 00 00   01 00 00 00   00 00 00 00   00 00 00 00   00 00 00 00
-                //30 30 30 30   30 30 30 30   30 30 30 30   30 30 20 20   20 20 20 20
+                //46 00 00 00   01 00 00 00   00 00 00 00   00 00 00 00   00 00 00 00 > 包头
+                //30 30 30 30   30 30 30 30   30 30 30 30   30 30 20 20   20 20 20 20 > 登入包
                 //20 20 20 20   32 30 31 37   30 35 30 35   32 33 35 38   33 31 35 35
                 //38 32 31 35   42 34 34 30   35 33 39 42   32 38 35 44   41 37 30 39
                 //37 38 43 37   43 38 31 34   42 35
 
-                if (20 > RecvLen) {
-                    objClient.close();
-                    objClient = null;
+                if (RecvLen < 20) {
+                    objClient.close();  // 长度过小 连包头20都不够
+                    objClient = null;   // 置 null （是否垃圾回收呢？）
                     continue;
                 }
 
                 //登入验证
                 String Pid = null;
-                if (null == (Pid = CheckClient(Buffer, objClient)))
+                if (null == (Pid = CheckClient(Buffer, objClient))) // Pid = [0000000000          ]
                     continue;
 
                 //登入回复
                 DataOutputStream SendChannel = new DataOutputStream(objClient.getOutputStream());
-
-                //RMI登入
+                //RMI登入 Pid = [0000000000          ]
                 if (0 == Integer.parseInt(Pid.trim())) {
                     System.out.println();
                     SendChannel.write(new String(Buffer, 0, 44).getBytes());
-                }
-                //DTU登入
-                else {
-                    //对时
+                //DTU登入 后对时一次
+                }else {
+                    //对时 （建议 RespBuf 优化为 StringBuilder）
                     String RespBuf = new String(Buffer, 0, 20);
-                    RespBuf += CommUtil.StrBRightFillSpace("", 20);        //保留字
-                    RespBuf += CommUtil.StrBRightFillSpace("0000", 4);        //命令发送状态
-                    RespBuf += CommUtil.StrBRightFillSpace("3002", 4);        //处理指令
-                    RespBuf += CommUtil.StrBRightFillSpace(Pid, 10);        //DTU的ID
-                    RespBuf += CommUtil.StrBRightFillSpace("00010002", 8);            //发送的指令
-                    RespBuf += CommUtil.StrBRightFillSpace("AppSvr", 10);        //操作用户
-                    RespBuf += CommUtil.StrBRightFillSpace(CommUtil.getTime(), 14);        //指令内容
+                    RespBuf += CommUtil.StrBRightFillSpace("", 20);                 //保留字
+                    RespBuf += CommUtil.StrBRightFillSpace("0000", 4);              //命令发送状态
+                    RespBuf += CommUtil.StrBRightFillSpace("3002", 4);              //处理指令
+                    RespBuf += CommUtil.StrBRightFillSpace(Pid, 10);                //DTU的ID
+                    RespBuf += CommUtil.StrBRightFillSpace("00010002", 8);          //发送的指令
+                    RespBuf += CommUtil.StrBRightFillSpace("AppSvr", 10);           //操作用户
+                    RespBuf += CommUtil.StrBRightFillSpace(CommUtil.getTime(), 14); //指令内容
 
                     //System.out.println("Login Resp[" + new String(Buffer, 0, 44) + "]");
                     //System.out.println("Login RespTime[" + RespBuf + "]");
@@ -146,8 +152,8 @@ public class TcpSvr extends Thread {
                     SendChannel.write(RespBuf.getBytes());
                 }
                 SendChannel.flush();
-                objClient.setSoTimeout(0);
-                ClientStatusNotify(Pid, STATUS_CLIENT_ONLINE);
+                objClient.setSoTimeout(0); // 登录成功，设置不过期
+                ClientStatusNotify(Pid, STATUS_CLIENT_ONLINE);   // 状态通知CPM网关恢复在线 且  SetRecvMsgList
                 continue;
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -156,7 +162,9 @@ public class TcpSvr extends Thread {
         }//while
     }
 
-    //登入验证
+    /**
+     * 登入验证
+     */
     protected String CheckClient(byte[] Buffer, Socket objClient) {
 
         String ret = null;
@@ -164,17 +172,17 @@ public class TcpSvr extends Thread {
             DataInputStream DinStream = new DataInputStream(new ByteArrayInputStream(Buffer));
             DinStream.readInt();
             int Cmd = CommUtil.converseInt(DinStream.readInt());
-            if (Cmd_Sta.COMM_LOGON != Cmd) {
+            if (Cmd_Sta.COMM_LOGON != Cmd) { // COMM_LOGON 请求登陆  = 0x00000001;
                 objClient.close();
                 objClient = null;
                 return null;
             }
 
             //登入验证
-            String Status = new String(Buffer, 20, 4);
-            String PId = new String(Buffer, 24, 20);
-            String TimeStamp = new String(Buffer, 44, 14);
-            String strMd5 = new String(Buffer, 58, 32);
+            String Status      = new String(Buffer, 20, 4);     // 业务执行状态 成功为 [0000]
+            String PId         = new String(Buffer, 24, 20);    // CPM_ID = [0000000000          ]
+            String TimeStamp   = new String(Buffer, 44, 14);    // [20170505235831]
+            String strMd5      = new String(Buffer, 58, 32);    // [558215B440539B285DA70978C7C814B5]
             String checkResult = checkClient(Status, PId, TimeStamp, strMd5);
             if (!checkResult.substring(0, 4).equalsIgnoreCase("0000")) {
                 objClient.close();
@@ -183,7 +191,7 @@ public class TcpSvr extends Thread {
             }
             ret = PId;
 
-            //验证是否已存在
+            // 验证是否已存在,若存在就关闭
             if (objClientTable.containsKey(PId)) {
                 CommUtil.PRINT("Id Already Exist!" + PId);
                 ClientClose(PId);
@@ -195,7 +203,7 @@ public class TcpSvr extends Thread {
                 CommUtil.LOG("ClientId [" + PId + "] ClientSocket init failed!");
             }
             synchronized (markClientTable) {
-                objClientTable.put(PId, objChannel);
+                objClientTable.put(PId, objChannel); // objChannel [ "0000000000" , ClientSocket ]
             }
 
             //更新通道IP
@@ -206,16 +214,30 @@ public class TcpSvr extends Thread {
             ex.printStackTrace();
         }
         return ret;
-
     }
 
+    /**
+     * checkClient:
+     * 将 APC获得 password 与 time、ID 组成 MD5 码与传进来的 MD5码进行比较
+     * 相同返回 "0000" 否则返回 "3006"
+     * @param strStatus
+     * @param strId
+     * @param strTimestamp
+     * @param strOriginalMd5
+     * @return
+     */
     public String checkClient(String strStatus, String strId, String strTimestamp, String strOriginalMd5) {
-        String ret = "3006";
-        String password = m_DbUtil.APC(CommUtil.StrRightFillSpace(strId, 40) + strStatus + "0001");
+        String ret = "3006"; // 初始系统状态：默认失败
+        String password = m_DbUtil.APC(CommUtil.StrRightFillSpace(strId, 40) + strStatus + "0001"); // 密码：111111
         String strData = strId + strTimestamp + password;
-        System.out.println("strData[" + strData + "]");
+        System.out.println("strData[" + strData + "]"); // strData[0000000000          20170505235831111111]
         String Temp = CommUtil.BytesToHexString(new Md5().encrypt(strData.getBytes()), 16);
-        System.out.println("Temp[" + Temp + "]");
+        System.out.println("Temp[" + Temp + "]");       // Temp[558215b440539b285da70978c7c814b5]
+        // Client    [0000000000          ]
+        // TimeStamp [20170505235831]
+        // OldMd5    [558215B440539B285DA70978C7C814B5]
+        // NewMd5    [558215b440539b285da70978c7c814b5]
+        // DbMsg     [111111]
         CommUtil.LOG("Client[" + strId + "] TimeStamp[" + strTimestamp + "] OldMd5[" + strOriginalMd5 + "] NewMd5[" + Temp + "] DbMsg[" + password + "]");
 
         if (Temp.equalsIgnoreCase(strOriginalMd5)) {
@@ -229,11 +251,11 @@ public class TcpSvr extends Thread {
         try {
             ByteArrayOutputStream boutStream = new ByteArrayOutputStream();
             DataOutputStream doutStream = new DataOutputStream(boutStream);
-            doutStream.writeInt(CommUtil.converseInt(CmdUtil.MSGHDRLEN));
-            doutStream.writeInt(CommUtil.converseInt(CmdUtil.COMM_ACTIVE_TEST));
-            doutStream.writeInt(0);
-            doutStream.writeInt(CommUtil.converseInt(GetSeq()));
-            doutStream.writeInt(0);
+            doutStream.writeInt(CommUtil.converseInt(CmdUtil.MSGHDRLEN));           // 包头长度
+            doutStream.writeInt(CommUtil.converseInt(CmdUtil.COMM_ACTIVE_TEST));    // 链接测试
+            doutStream.writeInt(0);                                                 // 成功状态 0
+            doutStream.writeInt(CommUtil.converseInt(GetSeq()));                    // 序列号
+            doutStream.writeInt(0);                                                 // 保留字段 0
             byteData = boutStream.toByteArray();
             doutStream.close();
             boutStream.close();
@@ -244,6 +266,10 @@ public class TcpSvr extends Thread {
         return byteData;
     }
 
+    /**
+     * 状态通知CPM网关恢复在线 且  SetRecvMsgList
+     * [STATUS_CLIENT_ONLINE,STATUS_CLIENT_OFFLINE]
+     */
     public void ClientStatusNotify(String strClientKey, int iStatus) {
         switch (iStatus) {
             case STATUS_CLIENT_ONLINE: {
@@ -259,7 +285,8 @@ public class TcpSvr extends Thread {
                         + "7"
                         + CommUtil.StrBRightFillSpace((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()), 20)
                         + CommUtil.StrBRightFillSpace("网关恢复在线", 128);
-                SetRecvMsgList((strClientKey + new String(EnCode(Cmd_Sta.COMM_SUBMMIT, OffStr))).getBytes());
+                // strClientKey = [0000000000          ]
+                SetRecvMsgList((strClientKey + new String(EnCode(Cmd_Sta.COMM_SUBMMIT, OffStr))).getBytes()); // COMM_SUBMMIT 0x00000004 客户端提交
                 break;
             }
             case STATUS_CLIENT_OFFLINE: {
@@ -281,7 +308,9 @@ public class TcpSvr extends Thread {
         }
     }
 
-    //如果收到关闭指令，就关闭SOCKET和释放资源
+    /**
+     * 如果收到关闭指令，就关闭SOCKET和释放资源
+     */
     public synchronized void ClientClose(String pClientKey) {
         try {
             if (!objClientTable.isEmpty() && objClientTable.containsKey(pClientKey)) {
@@ -319,6 +348,13 @@ public class TcpSvr extends Thread {
         }
     }
 
+    /**
+     * 分派调度
+     * @param msgCode
+     * @param clientKey
+     * @param pData
+     * @return
+     */
     public boolean DisPatch(int msgCode, String clientKey, String pData) {
         boolean ret = false;
         try {
@@ -562,9 +598,9 @@ public class TcpSvr extends Thread {
             }
 
             private byte DeCode(byte[] pMsg, Vector<Object> vectData) {
-                byte RetVal = CmdUtil.CODEC_ERR;
-                int nUsed = ((Integer) vectData.get(0)).intValue();//现有的数据长度
-                int nCursor = ((Integer) vectData.get(1)).intValue();//从什么地方开始
+                byte RetVal  = CmdUtil.CODEC_ERR;
+                int  nUsed   = ((Integer) vectData.get(0)).intValue();//现有的数据长度
+                int  nCursor = ((Integer) vectData.get(1)).intValue();//从什么地方开始
                 try {
                     DataInputStream DinStream = new DataInputStream(new ByteArrayInputStream(pMsg));
                     if (nUsed < (int) CmdUtil.MSGHDRLEN) {
@@ -572,10 +608,10 @@ public class TcpSvr extends Thread {
                     }
                     DinStream.skip(nCursor);
 
-                    int unMsgLen = CommUtil.converseInt(DinStream.readInt());
+                    int unMsgLen  = CommUtil.converseInt(DinStream.readInt());
                     int unMsgCode = CommUtil.converseInt(DinStream.readInt());
-                    int unStatus = CommUtil.converseInt(DinStream.readInt());
-                    int unMsgSeq = CommUtil.converseInt(DinStream.readInt());
+                    int unStatus  = CommUtil.converseInt(DinStream.readInt());
+                    int unMsgSeq  = CommUtil.converseInt(DinStream.readInt());
                     int unReserve = CommUtil.converseInt(DinStream.readInt());
                     //System.out.println("DeCode:" + new String(pMsg));
                     if (unMsgLen < CmdUtil.MSGHDRLEN || unMsgLen > CmdUtil.RECV_BUFFER_SIZE) {
